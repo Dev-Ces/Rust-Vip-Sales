@@ -124,7 +124,7 @@
 <style>
     .hero-section {
         position: relative;
-        background-image: url('{{ url_for("static", filename="img/rust-bg.jpg") }}');
+        background-image: url('{{ url_for("static", filename="img/rust-bg.jpg")|fix_image_url }}');
         background-size: cover;
         background-position: center;
         height: 500px;

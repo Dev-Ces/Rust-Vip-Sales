@@ -1,0 +1,132 @@
+{
+  "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+  "meta": {
+    "version": "PTDL_v2",
+    "update_url": null
+  },
+  "exported_at": "2024-01-01T00:00:00+00:00",
+  "name": "Rust VIP Sales",
+  "author": "youremail@example.com",
+  "description": "A Flask-based VIP sales system for Rust servers with cryptocurrency payment integration.",
+  "features": ["python"],
+  "docker_images": {
+    "Python 3.9": "ghcr.io/pterodactyl/yolks:python_3.9"
+  },
+  "file_denylist": [],
+  "startup": "pip install -r requirements.txt && python start.py",
+  "config": {
+    "files": "{}\r\n",
+    "startup": "{\r\n    \"done\": [\"Running on\", \"* Running on\"]\r\n}",
+    "logs": "{}\r\n",
+    "stop": "^C\r\n"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!/bin/bash\n\ncd /mnt/server\n\necho \"Installing Rust VIP Sales System...\"\n\n# Install git\napt-get update && apt-get install -y git\n\n# Clone repository\ngit clone https://github.com/Dev-Ces/Rust-Vip-Sales .\n\n# Create environment file\necho \"SECRET_KEY=change-this-to-a-secure-secret-key\" > .env\necho \"DATABASE_URL=sqlite:///app.db\" >> .env\necho \"ADMIN_USERNAME=${ADMIN_USERNAME}\" >> .env\necho \"ADMIN_PASSWORD=${ADMIN_PASSWORD}\" >> .env\necho \"BTC_ADDRESS=${BTC_ADDRESS}\" >> .env\necho \"ETH_ADDRESS=${ETH_ADDRESS}\" >> .env\necho \"LTC_ADDRESS=${LTC_ADDRESS}\" >> .env\necho \"USDT_ADDRESS=${USDT_ADDRESS}\" >> .env\necho \"PAYMENT_METHODS=btc,eth,ltc,usdt\" >> .env\necho \"PORT=${PORT}\" >> .env\necho \"RCON_HOST=${RCON_HOST}\" >> .env\necho \"RCON_PORT=${RCON_PORT}\" >> .env\necho \"RCON_PASSWORD=${RCON_PASSWORD}\" >> .env\n\necho \"Installation completed! You can now start the server.\"",
+      "container": "python:3.9-slim",
+      "entrypoint": "bash"
+    }
+  },
+  "variables": [
+    {
+      "name": "ADMIN_USERNAME",
+      "description": "Admin kullanıcı adı",
+      "env_variable": "ADMIN_USERNAME",
+      "default_value": "admin",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:20",
+      "field_type": "text"
+    },
+    {
+      "name": "ADMIN_PASSWORD",
+      "description": "Admin şifresi",
+      "env_variable": "ADMIN_PASSWORD",
+      "default_value": "adminpassword",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:20",
+      "field_type": "text"
+    },
+    {
+      "name": "BTC_ADDRESS",
+      "description": "Bitcoin cüzdan adresi",
+      "env_variable": "BTC_ADDRESS",
+      "default_value": "YOUR_BTC_ADDRESS",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string",
+      "field_type": "text"
+    },
+    {
+      "name": "ETH_ADDRESS",
+      "description": "Ethereum cüzdan adresi",
+      "env_variable": "ETH_ADDRESS",
+      "default_value": "YOUR_ETH_ADDRESS",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string",
+      "field_type": "text"
+    },
+    {
+      "name": "LTC_ADDRESS",
+      "description": "Litecoin cüzdan adresi",
+      "env_variable": "LTC_ADDRESS",
+      "default_value": "YOUR_LTC_ADDRESS",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string",
+      "field_type": "text"
+    },
+    {
+      "name": "USDT_ADDRESS",
+      "description": "USDT cüzdan adresi",
+      "env_variable": "USDT_ADDRESS",
+      "default_value": "YOUR_USDT_ADDRESS",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string",
+      "field_type": "text"
+    },
+    {
+      "name": "PORT",
+      "description": "Web sunucusu portu",
+      "env_variable": "PORT",
+      "default_value": "8080",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|numeric|max:65535",
+      "field_type": "text"
+    },
+    {
+      "name": "RCON_HOST",
+      "description": "RCON sunucu adresi",
+      "env_variable": "RCON_HOST",
+      "default_value": "127.0.0.1",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string",
+      "field_type": "text"
+    },
+    {
+      "name": "RCON_PORT",
+      "description": "RCON portu",
+      "env_variable": "RCON_PORT",
+      "default_value": "28016",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|numeric|max:65535",
+      "field_type": "text"
+    },
+    {
+      "name": "RCON_PASSWORD",
+      "description": "RCON şifresi",
+      "env_variable": "RCON_PASSWORD",
+      "default_value": "your_rcon_password",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string",
+      "field_type": "text"
+    }
+  ]
+}

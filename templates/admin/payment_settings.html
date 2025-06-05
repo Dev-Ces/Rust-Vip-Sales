@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}Rust VIP - Ödeme Ayarları{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="admin-title">Ödeme Ayarları</h1>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="admin-sidebar">
+            <div class="admin-user-info">
+                <div class="admin-avatar">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="admin-user-details">
+                    <h5>{{ current_user.username }}</h5>
+                    <span class="admin-badge">Yönetici</span>
+                </div>
+            </div>
+            
+            <ul class="admin-nav">
+                <li>
+                    <a href="{{ url_for('admin') }}">
+                        <i class="fas fa-tachometer-alt"></i> Kontrol Paneli
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_orders') }}">
+                        <i class="fas fa-shopping-cart"></i> Siparişler
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="{{ url_for('admin_payment_settings') }}">
+                        <i class="fas fa-money-bill-wave"></i> Ödeme Ayarları
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('index') }}">
+                        <i class="fas fa-home"></i> Siteye Dön
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="admin-content-card">
+            <div class="card-header">
+                <h5>Kripto Para Ayarları</h5>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-success">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="POST" action="{{ url_for('admin_payment_settings') }}">
+                    <div class="crypto-settings-container">
+                        <!-- Bitcoin Ayarları -->
+                        <div class="crypto-setting">
+                            <div class="crypto-header">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="payment_methods" value="btc" id="bitcoin" {% if 'btc' in payment_methods %}checked{% endif %}>
+                                    <label class="form-check-label" for="bitcoin">
+                                        <img src="{{ url_for('static', filename='img/bitcoin.svg')|fix_image_url }}" alt="Bitcoin" width="24"> Bitcoin (BTC)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="crypto-body">
+                                <div class="form-group">
+                                    <label for="btc_address">Bitcoin Cüzdan Adresi</label>
+                                    <input type="text" class="form-control" id="btc_address" name="btc_address" value="{{ btc_address }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Ethereum Ayarları -->
+                        <div class="crypto-setting">
+                            <div class="crypto-header">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="payment_methods" value="eth" id="ethereum" {% if 'eth' in payment_methods %}checked{% endif %}>
+                                    <label class="form-check-label" for="ethereum">
+                                        <img src="{{ url_for('static', filename='img/ethereum.svg')|fix_image_url }}" alt="Ethereum" width="24"> Ethereum (ETH)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="crypto-body">
+                                <div class="form-group">
+                                    <label for="eth_address">Ethereum Cüzdan Adresi</label>
+                                    <input type="text" class="form-control" id="eth_address" name="eth_address" value="{{ eth_address }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Litecoin Ayarları -->
+                        <div class="crypto-setting">
+                            <div class="crypto-header">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="payment_methods" value="ltc" id="litecoin" {% if 'ltc' in payment_methods %}checked{% endif %}>
+                                    <label class="form-check-label" for="litecoin">
+                                        <img src="{{ url_for('static', filename='img/litecoin.svg')|fix_image_url }}" alt="Litecoin" width="24"> Litecoin (LTC)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="crypto-body">
+                                <div class="form-group">
+                                    <label for="ltc_address">Litecoin Cüzdan Adresi</label>
+                                    <input type="text" class="form-control" id="ltc_address" name="ltc_address" value="{{ ltc_address }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- USDT Ayarları -->
+                        <div class="crypto-setting">
+                            <div class="crypto-header">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="payment_methods" value="usdt" id="usdt" {% if 'usdt' in payment_methods %}checked{% endif %}>
+                                    <label class="form-check-label" for="usdt">
+                                        <i class="fas fa-dollar-sign"></i> Tether (USDT)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="crypto-body">
+                                <div class="form-group">
+                                    <label for="usdt_address">USDT Cüzdan Adresi</label>
+                                    <input type="text" class="form-control" id="usdt_address" name="usdt_address" value="{{ usdt_address }}">
+                                    <small class="form-text text-muted">USDT için ağ türünü belirtmeyi unutmayın (örn: ERC20, TRC20)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary mt-4">Ayarları Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .crypto-settings-container {
+        margin-top: 10px;
+    }
+    
+    .crypto-setting {
+        margin-bottom: 20px;
+        border: 1px solid #333;
+        border-radius: 5px;
+        overflow: hidden;
+        background-color: #1e2124;
+    }
+    
+    .crypto-header {
+        padding: 10px 15px;
+        background-color: #2a2e32;
+        border-bottom: 1px solid #333;
+    }
+    
+    .crypto-body {
+        padding: 15px;
+    }
+    
+    .form-check {
+        margin-bottom: 0;
+    }
+    
+    .form-check-label {
+        display: flex;
+        align-items: center;
+        color: #fff;
+        font-weight: bold;
+    }
+    
+    .form-check-label img,
+    .form-check-label i {
+        margin-right: 10px;
+    }
+    
+    .form-check-input:checked {
+        background-color: #ff6b00;
+        border-color: #ff6b00;
+    }
+    
+    .form-control {
+        background-color: #2a2e32;
+        border-color: #333;
+        color: #fff;
+    }
+    
+    .form-control:focus {
+        background-color: #2a2e32;
+        border-color: #ff6b00;
+        color: #fff;
+        box-shadow: 0 0 0 0.25rem rgba(255, 107, 0, 0.25);
+    }
+    
+    .form-text {
+        color: #aaa;
+    }
+</style>
+{% endblock %}

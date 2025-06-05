@@ -7,11 +7,32 @@ import requests
 import json
 from datetime import datetime
 import uuid
+import re
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'rustvipdevelopmentkey')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///rustvip.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Resim URL'lerini düzeltmek için yardımcı fonksiyon
+def fix_image_url(url):
+    # Eğer URL zaten tam bir URL ise değiştirme
+    if url.startswith('http://') or url.startswith('https://'):
+        return url
+    
+    # Eğer URL /static/ ile başlıyorsa, doğru yolu döndür
+    if url.startswith('/static/'):
+        return url
+    
+    # Eğer URL static/ ile başlıyorsa, başına / ekle
+    if url.startswith('static/'):
+        return '/' + url
+    
+    # Diğer durumlarda URL'yi olduğu gibi döndür
+    return url
+
+# Jinja2 filtresi olarak ekle
+app.jinja_env.filters['fix_image_url'] = fix_image_url
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -205,6 +226,51 @@ def admin():
         return redirect(url_for('index'))
     
     return render_template('admin/index.html')
+
+# Admin paneli - Ödeme ayarları
+@app.route('/admin/payment-settings', methods=['GET', 'POST'])
+@login_required
+def admin_payment_settings():
+    if not current_user.is_admin:
+        flash('Bu sayfaya erişim izniniz yok')
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        # Kripto adreslerini al
+        btc_address = request.form.get('btc_address', '')
+        eth_address = request.form.get('eth_address', '')
+        ltc_address = request.form.get('ltc_address', '')
+        usdt_address = request.form.get('usdt_address', '')
+        
+        # Aktif ödeme yöntemlerini al
+        payment_methods = request.form.getlist('payment_methods')
+        
+        # Veritabanı veya dosya sisteminde saklama işlemi burada yapılabilir
+        # Şimdilik sadece başarılı mesajı gösterelim
+        
+        # Çevre değişkenlerini güncelleme (gerçek uygulamada dosyaya yazılmalı)
+        os.environ['BTC_ADDRESS'] = btc_address
+        os.environ['ETH_ADDRESS'] = eth_address
+        os.environ['LTC_ADDRESS'] = ltc_address
+        os.environ['USDT_ADDRESS'] = usdt_address
+        os.environ['PAYMENT_METHODS'] = ','.join(payment_methods)
+        
+        flash('Ödeme ayarları başarıyla güncellendi')
+        return redirect(url_for('admin_payment_settings'))
+    
+    # Mevcut ayarları göster
+    btc_address = os.environ.get('BTC_ADDRESS', '')
+    eth_address = os.environ.get('ETH_ADDRESS', '')
+    ltc_address = os.environ.get('LTC_ADDRESS', '')
+    usdt_address = os.environ.get('USDT_ADDRESS', '')
+    payment_methods = os.environ.get('PAYMENT_METHODS', 'btc,eth,ltc,usdt').split(',')
+    
+    return render_template('admin/payment_settings.html', 
+                           btc_address=btc_address,
+                           eth_address=eth_address,
+                           ltc_address=ltc_address,
+                           usdt_address=usdt_address,
+                           payment_methods=payment_methods)
 
 # Admin paneli - Tüm siparişler
 @app.route('/admin/orders')

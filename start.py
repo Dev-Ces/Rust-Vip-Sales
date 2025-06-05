@@ -1,49 +1,34 @@
 import os
-import subprocess
-import sys
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash
+from app import app, db, User
 
-def install_requirements():
-    """Install required packages to user's home directory"""
-    try:
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--user', '-r', 'requirements.txt'])
-        return True
-    except subprocess.CalledProcessError:
-        return False
-
-def main():
-    # İlk olarak requirements'ları yükle
-    print("Installing requirements...")
-    if not install_requirements():
-        print("Error installing requirements!")
-        sys.exit(1)
-
-    # Python path'ine kullanıcının site-packages'ını ekle
-    python_version = f"python{sys.version_info.major}.{sys.version_info.minor}"
-    user_site_packages = os.path.expanduser(f"~/.local/lib/{python_version}/site-packages")
-    sys.path.append(user_site_packages)
-
-    # Add the current directory to Python path
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    if current_dir not in sys.path:
-        sys.path.insert(0, current_dir)
-        print(f"Added {current_dir} to Python path")
-    
-    print("Python path:", sys.path)
-    print("Current directory:", os.getcwd())
-    print("Directory contents:", os.listdir())
-
-    try:
-        # Şimdi uygulamayı başlat
-        from app import create_app
-        app = create_app()
+def create_admin_user():
+    with app.app_context():
+        # Veritabanını oluştur
+        db.create_all()
         
-        port = int(os.environ.get('PORT', 8080))
-        app.run(host='0.0.0.0', port=port)
-    except Exception as e:
-        print(f"Error starting app: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+        # Admin kullanıcısını kontrol et ve oluştur
+        admin_username = os.environ.get('ADMIN_USERNAME', 'admin')
+        admin_password = os.environ.get('ADMIN_PASSWORD', 'adminpassword')
+        
+        admin = User.query.filter_by(username=admin_username).first()
+        if not admin:
+            print(f"Creating admin user: {admin_username}")
+            admin = User(username=admin_username, email=f"{admin_username}@rustvip.com", is_admin=True)
+            admin.set_password(admin_password)
+            db.session.add(admin)
+            db.session.commit()
+            print("Admin user created successfully!")
+        else:
+            print("Admin user already exists.")
 
 if __name__ == '__main__':
-    main() 
+    port = int(os.environ.get('PORT', 8080))
+    print(f"Starting server on port {port}...")
+    
+    # Admin kullanıcısını oluştur
+    create_admin_user()
+    
+    # Sunucuyu başlat
+    app.run(host='0.0.0.0', port=port, debug=False)
