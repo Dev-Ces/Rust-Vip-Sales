@@ -1,0 +1,72 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2024-01-01T00:00:00+00:00",
+    "name": "Rust VIP Sales",
+    "author": "youremail@example.com",
+    "description": "A Flask-based VIP sales system for Rust servers with cryptocurrency payment integration.",
+    "features": ["python"],
+    "docker_images": {
+        "Python 3.9": "ghcr.io/pterodactyl/yolks:python_3.9"
+    },
+    "file_denylist": [],
+    "startup": "pip install -r requirements.txt && python start.py",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": [\"Running on\", \"* Running on\"]\r\n}",
+        "logs": "{}",
+        "stop": "^C"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/bash\r\n\r\ncd \/mnt\/server\r\n\r\necho \"Installing Rust VIP Sales System...\"\r\n\r\n# Install git\r\napt-get update && apt-get install -y git\r\n\r\n# Clone repository\r\ngit clone https://github.com/Dev-Ces/Rust-Vip-Sales .\r\n\r\n# Create environment file\r\necho \"SECRET_KEY=change-this-to-a-secure-secret-key\" > .env\r\necho \"DATABASE_URL=sqlite:///app.db\" >> .env\r\necho \"ADMIN_USERNAME=admin\" >> .env\r\necho \"ADMIN_PASSWORD=change-this-to-a-secure-password\" >> .env\r\necho \"CRYPTO_ADDRESS=your-cryptocurrency-wallet-address\" >> .env\r\necho \"PORT=8080\" >> .env\r\n\r\necho \"Installation completed! You can now start the server.\"",
+            "container": "python:3.9-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Admin Username",
+            "description": "Username for admin panel access",
+            "env_variable": "ADMIN_USERNAME",
+            "default_value": "admin",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:20",
+            "field_type": "text"
+        },
+        {
+            "name": "Admin Password",
+            "description": "Password for admin panel access",
+            "env_variable": "ADMIN_PASSWORD",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|min:8",
+            "field_type": "text"
+        },
+        {
+            "name": "Crypto Address",
+            "description": "Your cryptocurrency wallet address for payments",
+            "env_variable": "CRYPTO_ADDRESS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Server Port",
+            "description": "The port the application will run on",
+            "env_variable": "PORT",
+            "default_value": "8080",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|numeric|min:1024|max:65535",
+            "field_type": "text"
+        }
+    ]
+} 

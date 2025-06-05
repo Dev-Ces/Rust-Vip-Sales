@@ -1,15 +1,26 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_login import login_required, current_user
 from app import db
-from app.models import Order, ServerStats
+from app.models import Order, ServerStats, User
+from app.utils import get_player_count, grant_vip_access
 from config import Config
+from functools import wraps
 
 main = Blueprint('main', __name__)
 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            flash('Bu sayfaya erişim yetkiniz yok.')
+            return redirect(url_for('main.index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @main.route('/')
 def index():
-    stats = ServerStats.get_current_stats()
-    return render_template('index.html', stats=stats)
+    player_count = get_player_count()
+    return render_template('index.html', stats={'player_count': player_count})
 
 @main.route('/shop')
 @login_required
@@ -62,16 +73,39 @@ def create_order():
 @login_required
 def order_status(order_id):
     order = Order.query.get_or_404(order_id)
-    if order.user_id != current_user.id:
+    if order.user_id != current_user.id and not current_user.is_admin:
         flash('Yetkisiz erişim')
         return redirect(url_for('main.index'))
     return render_template('order_status.html', order=order)
 
-@main.route('/update-player-count', methods=['POST'])
-def update_player_count():
-    count = request.json.get('count', 0)
-    stats = ServerStats()
-    stats.player_count = count
-    db.session.add(stats)
-    db.session.commit()
-    return jsonify({'success': True}) 
+@main.route('/admin/orders')
+@admin_required
+def admin_orders():
+    orders = Order.query.order_by(Order.created_at.desc()).all()
+    return render_template('admin/orders.html', orders=orders)
+
+@main.route('/admin/order/<int:order_id>/complete', methods=['POST'])
+@admin_required
+def complete_order(order_id):
+    order = Order.query.get_or_404(order_id)
+    
+    if order.status == 'completed':
+        flash('Bu sipariş zaten tamamlanmış.')
+        return redirect(url_for('main.admin_orders'))
+    
+    # VIP yetkisi ver
+    if grant_vip_access(order.steam_id):
+        order.status = 'completed'
+        order.payment_confirmed = True
+        db.session.commit()
+        flash('Sipariş tamamlandı ve VIP yetkileri verildi.')
+    else:
+        flash('VIP yetkileri verilirken bir hata oluştu. Lütfen manuel olarak kontrol edin.')
+    
+    return redirect(url_for('main.admin_orders'))
+
+@main.route('/api/player-count')
+def get_current_player_count():
+    """API endpoint to get current player count"""
+    count = get_player_count()
+    return jsonify({'player_count': count}) 

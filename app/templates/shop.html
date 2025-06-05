@@ -2,78 +2,40 @@
 
 {% block content %}
 <div class="container fade-in-up">
-    <h1 class="text-center mb-5 text-glow">VIP Packages</h1>
+    <h1 class="text-center mb-5 text-glow">VIP Paketi</h1>
     
     <div class="row justify-content-center">
-        <!-- Basic VIP -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h3 class="card-title mb-3">Basic VIP</h3>
-                    <div class="price display-4 my-4 text-glow" style="color: var(--rust-primary);">$10</div>
-                    <ul class="list-unstyled" style="color: rgba(255, 255, 255, 0.9);">
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Basic Kit Command</li>
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Home Commands (2)</li>
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Priority Queue</li>
-                    </ul>
-                    <form action="{{ url_for('main.cart') }}" method="GET" class="mt-4">
-                        <input type="hidden" name="package" value="basic">
-                        <input type="hidden" name="amount" value="10">
-                        <button type="submit" class="btn btn-rust btn-lg w-100">
-                            <i class="fas fa-shopping-cart me-2"></i>Select Package
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Premium VIP -->
-        <div class="col-md-4 mb-4">
+        <div class="col-md-6 mb-4">
             <div class="card h-100" style="border: 2px solid var(--rust-primary);">
                 <div class="card-body text-center">
                     <div class="ribbon" style="position: absolute; top: 20px; right: -5px; padding: 5px 15px; background: var(--rust-primary); color: white; transform: rotate(45deg);">
-                        Popular
+                        VIP
                     </div>
-                    <h3 class="card-title mb-3">Premium VIP</h3>
-                    <div class="price display-4 my-4 text-glow" style="color: var(--rust-primary);">$25</div>
+                    <h3 class="card-title mb-3">Rust VIP</h3>
+                    <div class="price display-4 my-4 text-glow" style="color: var(--rust-primary);">€5</div>
                     <ul class="list-unstyled" style="color: rgba(255, 255, 255, 0.9);">
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Advanced Kit Command</li>
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Home Commands (5)</li>
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Priority Queue</li>
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Skin Box Access</li>
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Custom Chat Color</li>
+                        <li class="mb-3">
+                            <i class="fas fa-palette me-2" style="color: var(--rust-accent);"></i>
+                            <strong>Renkli İsim</strong> - Sunucuda özel renkli isim kullanabilme
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-star me-2" style="color: var(--rust-accent);"></i>
+                            <strong>Sıra Beklemeden Giriş</strong> - Server dolu olsa bile anında giriş yapabilme
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-crown me-2" style="color: var(--rust-accent);"></i>
+                            <strong>VIP Yetkileri</strong> - Özel VIP komutlarına erişim
+                        </li>
+                        <li class="mb-3">
+                            <i class="fab fa-discord me-2" style="color: var(--rust-accent);"></i>
+                            <strong>Discord Rolü</strong> - Discord sunucumuzda özel VIP rolü
+                        </li>
                     </ul>
                     <form action="{{ url_for('main.cart') }}" method="GET" class="mt-4">
-                        <input type="hidden" name="package" value="premium">
-                        <input type="hidden" name="amount" value="25">
+                        <input type="hidden" name="package" value="vip">
+                        <input type="hidden" name="amount" value="5">
                         <button type="submit" class="btn btn-rust btn-lg w-100">
-                            <i class="fas fa-shopping-cart me-2"></i>Select Package
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Elite VIP -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h3 class="card-title mb-3">Elite VIP</h3>
-                    <div class="price display-4 my-4 text-glow" style="color: var(--rust-primary);">$50</div>
-                    <ul class="list-unstyled" style="color: rgba(255, 255, 255, 0.9);">
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Elite Kit Command</li>
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Home Commands (10)</li>
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Priority Queue</li>
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Skin Box Access</li>
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Custom Chat Color</li>
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Custom Join Message</li>
-                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Discord Role</li>
-                    </ul>
-                    <form action="{{ url_for('main.cart') }}" method="GET" class="mt-4">
-                        <input type="hidden" name="package" value="elite">
-                        <input type="hidden" name="amount" value="50">
-                        <button type="submit" class="btn btn-rust btn-lg w-100">
-                            <i class="fas fa-shopping-cart me-2"></i>Select Package
+                            <i class="fas fa-shopping-cart me-2"></i>Satın Al
                         </button>
                     </form>
                 </div>
