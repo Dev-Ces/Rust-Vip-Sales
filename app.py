@@ -218,9 +218,10 @@ def my_orders():
     return render_template('my_orders.html', orders=orders)
 
 # Admin paneli - Giriş kontrolü
-@app.route('/admin')
+@app.route('/admin', defaults={'path': ''})
+@app.route('/admin/')
 @login_required
-def admin():
+def admin(path=None):
     if not current_user.is_admin:
         flash('Bu sayfaya erişim izniniz yok')
         return redirect(url_for('index'))
@@ -312,12 +313,19 @@ with app.app_context():
     db.create_all()
     
     # Admin kullanıcısı oluştur (ilk çalıştırmada)
-    admin = User.query.filter_by(username='admin').first()
+    admin_username = os.environ.get('ADMIN_USERNAME', 'admin')
+    admin_password = os.environ.get('ADMIN_PASSWORD', 'adminpassword')
+    
+    admin = User.query.filter_by(username=admin_username).first()
     if not admin:
-        admin = User(username='admin', email='admin@rustvip.com', is_admin=True)
-        admin.set_password('adminpassword')
+        print(f"Creating admin user: {admin_username}")
+        admin = User(username=admin_username, email=f"{admin_username}@rustvip.com", is_admin=True)
+        admin.set_password(admin_password)
         db.session.add(admin)
         db.session.commit()
+        print("Admin user created successfully!")
+    else:
+        print(f"Admin user already exists: {admin_username}")
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
