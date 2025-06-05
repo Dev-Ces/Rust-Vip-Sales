@@ -380,6 +380,20 @@
 
 {% block extra_js %}
 <script>
+    // Sipariş durumunu metne çeviren fonksiyon
+    function getStatusText(status) {
+        switch(status) {
+            case 'pending':
+                return 'İşleniyor';
+            case 'completed':
+                return 'Tamamlandı';
+            case 'cancelled':
+                return 'İptal Edildi';
+            default:
+                return 'Bilinmiyor';
+        }
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {
         // İstatistikleri güncelle
         updateDashboardStats();
@@ -401,6 +415,9 @@
         
         // Her 5 dakikada bir RCON durumunu kontrol et
         setInterval(checkRconStatus, 300000);
+        
+        // Her 1 dakikada bir son siparişleri güncelle
+        setInterval(loadRecentOrders, 60000);
     });
     
     function updateDashboardStats() {
@@ -468,71 +485,54 @@
     }
     
     function loadRecentOrders() {
-        // Son siparişleri yükleme simülasyonu
+        // Son siparişleri API'den yükle
         const tableBody = document.querySelector('#recent-orders-table tbody');
-        const sampleOrders = [
-            {
-                orderNumber: 'RVS-1A2B3C4D',
-                date: '10.06.2023 14:30',
-                user: 'user123',
-                steamId: '76561198123456789',
-                amount: '10 USD',
-                status: 'pending'
-            },
-            {
-                orderNumber: 'RVS-5E6F7G8H',
-                date: '09.06.2023 18:45',
-                user: 'gamer456',
-                steamId: '76561198987654321',
-                amount: '20 USD',
-                status: 'completed'
-            },
-            {
-                orderNumber: 'RVS-9I0J1K2L',
-                date: '08.06.2023 09:15',
-                user: 'player789',
-                steamId: '76561198456789123',
-                amount: '30 USD',
-                status: 'cancelled'
-            }
-        ];
         
-        tableBody.innerHTML = '';
+        // Yükleniyor göstergesi
+        tableBody.innerHTML = '<tr><td colspan="7" class="text-center">Yükleniyor...</td></tr>';
         
-        sampleOrders.forEach(order => {
-            const row = document.createElement('tr');
-            
-            let statusBadge = '';
-            if (order.status === 'pending') {
-                statusBadge = '<span class="status-badge status-pending">İşleniyor</span>';
-            } else if (order.status === 'completed') {
-                statusBadge = '<span class="status-badge status-completed">Tamamlandı</span>';
-            } else if (order.status === 'cancelled') {
-                statusBadge = '<span class="status-badge status-cancelled">İptal Edildi</span>';
-            }
-            
-            row.innerHTML = `
-                <td>${order.orderNumber}</td>
-                <td>${order.date}</td>
-                <td>${order.user}</td>
-                <td>${order.steamId}</td>
-                <td>${order.amount}</td>
-                <td>${statusBadge}</td>
-                <td>
-                    <button class="btn btn-sm btn-primary">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn btn-sm btn-success">
-                        <i class="fas fa-check"></i>
-                    </button>
-                    <button class="btn btn-sm btn-danger">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </td>
-            `;
-            
-            tableBody.appendChild(row);
-        });
+        fetch('/api/orders/recent')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.orders) {
+                    tableBody.innerHTML = '';
+                    
+                    if (data.orders.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="7" class="text-center">Henüz sipariş bulunmuyor</td></tr>';
+                        return;
+                    }
+                    
+                    data.orders.forEach(order => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${order.orderNumber}</td>
+                            <td>${order.date}</td>
+                            <td>${order.user}</td>
+                            <td>${order.steamId}</td>
+                            <td>${order.amount}</td>
+                            <td>
+                                <div class="status-indicator">
+                                    <div class="status-dot ${order.status}"></div>
+                                    <span>${getStatusText(order.status)}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="/admin/orders" class="btn btn-sm btn-primary">Detay</a>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="7" class="text-center">Siparişler yüklenirken bir hata oluştu</td></tr>';
+                }
+            })
+            .catch(error => {
+                console.error('Son siparişler yüklenirken hata:', error);
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center">Siparişler yüklenirken bir hata oluştu</td></tr>';
+            });
+        
+        
+        // Bu kısım artık API'den gelen verilerle doldurulacak
     }
     
     function testRconCommand() {

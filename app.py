@@ -80,7 +80,7 @@ from rcon.source import rcon
 
 def check_rcon_connection():
     try:
-        response = rcon(f"status", host=RCON_HOST, port=RCON_PORT, passwd=RCON_PASSWORD, timeout=3)
+        response = rcon(f"status", host=RCON_HOST, port=RCON_PORT, passwd=RCON_PASSWORD)
         return True, response
     except Exception as e:
         print(f"RCON error: {e}")
@@ -88,7 +88,7 @@ def check_rcon_connection():
 
 def get_player_count():
     try:
-        response = rcon(f"status", host=RCON_HOST, port=RCON_PORT, passwd=RCON_PASSWORD, timeout=3)
+        response = rcon(f"status", host=RCON_HOST, port=RCON_PORT, passwd=RCON_PASSWORD)
         # Gerçek bir Rust sunucusunda oyuncu sayısını çıkarmak için response'u parse etmek gerekir
         # Şimdilik örnek bir değer döndürelim
         return 150
@@ -99,7 +99,18 @@ def get_player_count():
 # VIP grup ekleme fonksiyonu
 def add_vip_to_player(steam_id):
     try:
-        response = rcon(f"addgroup {steam_id} vip", host=RCON_HOST, port=RCON_PORT, passwd=RCON_PASSWORD, timeout=3)
+        # Kullanıcının belirttiği komut formatını kullan
+        response = rcon(f"chat user add {steam_id} vip", host=RCON_HOST, port=RCON_PORT, passwd=RCON_PASSWORD)
+        return True
+    except Exception as e:
+        print(f"RCON error: {e}")
+        return False
+
+# VIP grup kaldırma fonksiyonu
+def remove_vip_from_player(steam_id):
+    try:
+        # Kullanıcının belirttiği komut formatını kullan
+        response = rcon(f"chat user remove {steam_id} vip", host=RCON_HOST, port=RCON_PORT, passwd=RCON_PASSWORD)
         return True
     except Exception as e:
         print(f"RCON error: {e}")
@@ -108,7 +119,7 @@ def add_vip_to_player(steam_id):
 # RCON komutu çalıştırma fonksiyonu
 def execute_rcon_command(command):
     try:
-        response = rcon(command, host=RCON_HOST, port=RCON_PORT, passwd=RCON_PASSWORD, timeout=3)
+        response = rcon(command, host=RCON_HOST, port=RCON_PORT, passwd=RCON_PASSWORD)
         return True, response
     except Exception as e:
         print(f"RCON error: {e}")
@@ -410,6 +421,32 @@ def rcon_test():
     return jsonify({
         'success': success,
         'response': response
+    })
+
+# Son siparişleri getiren API endpoint'i
+@app.route('/api/orders/recent', methods=['GET'])
+@login_required
+def recent_orders():
+    if not current_user.is_admin:
+        return jsonify({'success': False, 'message': 'İzin reddedildi'}), 403
+    
+    # Son 5 siparişi getir
+    orders = Order.query.order_by(Order.created_at.desc()).limit(5).all()
+    
+    orders_list = []
+    for order in orders:
+        orders_list.append({
+            'orderNumber': f'RVS-{order.id}',
+            'date': order.created_at.strftime('%d.%m.%Y %H:%M'),
+            'user': order.user.username,
+            'steamId': order.steam_id,
+            'amount': f'{order.amount} {order.currency}',
+            'status': order.status
+        })
+    
+    return jsonify({
+        'success': True,
+        'orders': orders_list
     })
 
 # Veritabanını oluştur
