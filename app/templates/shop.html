@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-5" style="color: #c4412b;">VIP Packages</h1>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h3 class="card-title">Basic VIP</h3>
+                    <div class="price display-4 my-4" style="color: #c4412b;">$10</div>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Basic Kit Command</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Home Commands (2)</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Priority Queue</li>
+                    </ul>
+                    <form action="{{ url_for('main.cart') }}" method="GET">
+                        <input type="hidden" name="package" value="basic">
+                        <input type="hidden" name="amount" value="10">
+                        <button type="submit" class="btn btn-rust btn-lg w-100">Select Package</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border: 2px solid #c4412b;">
+                <div class="card-body text-center">
+                    <h3 class="card-title">Premium VIP</h3>
+                    <div class="price display-4 my-4" style="color: #c4412b;">$25</div>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Advanced Kit Command</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Home Commands (5)</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Priority Queue</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Skin Box Access</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Custom Chat Color</li>
+                    </ul>
+                    <form action="{{ url_for('main.cart') }}" method="GET">
+                        <input type="hidden" name="package" value="premium">
+                        <input type="hidden" name="amount" value="25">
+                        <button type="submit" class="btn btn-rust btn-lg w-100">Select Package</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h3 class="card-title">Elite VIP</h3>
+                    <div class="price display-4 my-4" style="color: #c4412b;">$50</div>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Elite Kit Command</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Home Commands (10)</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Priority Queue</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Skin Box Access</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Custom Chat Color</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Custom Join Message</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Discord Role</li>
+                    </ul>
+                    <form action="{{ url_for('main.cart') }}" method="GET">
+                        <input type="hidden" name="package" value="elite">
+                        <input type="hidden" name="amount" value="50">
+                        <button type="submit" class="btn btn-rust btn-lg w-100">Select Package</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

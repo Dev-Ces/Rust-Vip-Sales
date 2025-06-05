@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="card-title">Admin Settings</h2>
+                        <a href="{{ url_for('admin.index') }}" class="btn btn-outline-light">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+
+                    <form action="{{ url_for('admin.settings') }}" method="POST">
+                        <div class="mb-4">
+                            <h4>Payment Settings</h4>
+                            <div class="mb-3">
+                                <label for="crypto_address" class="form-label">Cryptocurrency Payment Address</label>
+                                <input type="text" class="form-control bg-dark text-light" id="crypto_address" 
+                                       name="crypto_address" value="{{ crypto_address }}" required>
+                                <div class="form-text text-light">
+                                    This address will be shown to customers for cryptocurrency payments.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Note: Some settings can only be changed through environment variables.
+                        </div>
+
+                        <div class="mb-4">
+                            <h4>Current Configuration</h4>
+                            <div class="list-group">
+                                <div class="list-group-item bg-dark">
+                                    <strong>Admin Username:</strong> Set via ADMIN_USERNAME environment variable
+                                </div>
+                                <div class="list-group-item bg-dark">
+                                    <strong>Admin Password:</strong> Set via ADMIN_PASSWORD environment variable
+                                </div>
+                                <div class="list-group-item bg-dark">
+                                    <strong>Steam API Key:</strong> Set via STEAM_API_KEY environment variable
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-rust">Save Settings</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
