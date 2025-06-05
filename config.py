@@ -9,5 +9,4 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'admin')
     ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'changeme')
-    CRYPTO_ADDRESS = os.getenv('CRYPTO_ADDRESS', '')
-    STEAM_API_KEY = os.getenv('STEAM_API_KEY', '') 
+    CRYPTO_ADDRESS = os.getenv('CRYPTO_ADDRESS', '') 
