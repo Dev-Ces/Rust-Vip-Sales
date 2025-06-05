@@ -1,31 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
+<div class="container fade-in-up">
     <div class="row justify-content-center">
         <div class="col-md-10 text-center">
             <div class="hero-section mb-5">
-                <h1 class="display-4 mb-4" style="color: #c4412b;">Welcome to Rust VIP Sales</h1>
-                <p class="lead mb-4">Get exclusive VIP benefits and enhance your Rust gaming experience!</p>
+                <h1 class="display-4 mb-4 text-glow">Welcome to Rust VIP Sales</h1>
+                <p class="lead mb-4" style="color: rgba(255, 255, 255, 0.9);">Get exclusive VIP benefits and enhance your Rust gaming experience!</p>
                 
-                <div class="player-count-card card mb-4">
+                <div class="player-count-card card mb-5">
                     <div class="card-body">
-                        <h3 class="card-title">Current Players Online</h3>
-                        <div class="display-1 text-rust mb-3" style="color: #c4412b;">
+                        <h3 class="card-title mb-4">Current Players Online</h3>
+                        <div class="display-1 mb-3 text-glow" style="color: var(--rust-primary);">
                             {{ stats.player_count if stats else 0 }}
                         </div>
-                        <p class="card-text">Join the action now!</p>
+                        <p class="card-text" style="color: rgba(255, 255, 255, 0.8);">Join the action now!</p>
                     </div>
                 </div>
 
                 {% if not current_user.is_authenticated %}
                 <div class="cta-buttons">
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-rust btn-lg me-3">Register Now</a>
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-rust btn-lg me-3">
+                        <i class="fas fa-user-plus me-2"></i> Register Now
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i> Login
+                    </a>
                 </div>
                 {% else %}
                 <div class="cta-buttons">
-                    <a href="{{ url_for('main.shop') }}" class="btn btn-rust btn-lg">Browse VIP Packages</a>
+                    <a href="{{ url_for('main.shop') }}" class="btn btn-rust btn-lg">
+                        <i class="fas fa-shopping-cart me-2"></i> Browse VIP Packages
+                    </a>
                 </div>
                 {% endif %}
             </div>
@@ -35,27 +41,27 @@
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <i class="fas fa-star fa-3x mb-3" style="color: #c4412b;"></i>
-                                <h3>VIP Benefits</h3>
-                                <p>Exclusive access to special features and privileges on our Rust server.</p>
+                                <i class="fas fa-star fa-3x mb-3" style="color: var(--rust-primary);"></i>
+                                <h3 class="mb-3">VIP Benefits</h3>
+                                <p style="color: rgba(255, 255, 255, 0.8);">Exclusive access to special features and privileges on our Rust server.</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <i class="fas fa-shield-alt fa-3x mb-3" style="color: #c4412b;"></i>
-                                <h3>Secure Payment</h3>
-                                <p>Safe and secure cryptocurrency payments for your peace of mind.</p>
+                                <i class="fas fa-shield-alt fa-3x mb-3" style="color: var(--rust-primary);"></i>
+                                <h3 class="mb-3">Secure Payment</h3>
+                                <p style="color: rgba(255, 255, 255, 0.8);">Safe and secure cryptocurrency payments for your peace of mind.</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <i class="fas fa-headset fa-3x mb-3" style="color: #c4412b;"></i>
-                                <h3>24/7 Support</h3>
-                                <p>Round-the-clock support for all your VIP-related questions.</p>
+                                <i class="fas fa-headset fa-3x mb-3" style="color: var(--rust-primary);"></i>
+                                <h3 class="mb-3">24/7 Support</h3>
+                                <p style="color: rgba(255, 255, 255, 0.8);">Round-the-clock support for all your VIP-related questions.</p>
                             </div>
                         </div>
                     </div>

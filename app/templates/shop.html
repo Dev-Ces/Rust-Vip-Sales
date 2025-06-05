@@ -1,68 +1,80 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <h1 class="text-center mb-5" style="color: #c4412b;">VIP Packages</h1>
+<div class="container fade-in-up">
+    <h1 class="text-center mb-5 text-glow">VIP Packages</h1>
     
     <div class="row justify-content-center">
+        <!-- Basic VIP -->
         <div class="col-md-4 mb-4">
             <div class="card h-100">
                 <div class="card-body text-center">
-                    <h3 class="card-title">Basic VIP</h3>
-                    <div class="price display-4 my-4" style="color: #c4412b;">$10</div>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Basic Kit Command</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Home Commands (2)</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Priority Queue</li>
+                    <h3 class="card-title mb-3">Basic VIP</h3>
+                    <div class="price display-4 my-4 text-glow" style="color: var(--rust-primary);">$10</div>
+                    <ul class="list-unstyled" style="color: rgba(255, 255, 255, 0.9);">
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Basic Kit Command</li>
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Home Commands (2)</li>
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Priority Queue</li>
                     </ul>
-                    <form action="{{ url_for('main.cart') }}" method="GET">
+                    <form action="{{ url_for('main.cart') }}" method="GET" class="mt-4">
                         <input type="hidden" name="package" value="basic">
                         <input type="hidden" name="amount" value="10">
-                        <button type="submit" class="btn btn-rust btn-lg w-100">Select Package</button>
+                        <button type="submit" class="btn btn-rust btn-lg w-100">
+                            <i class="fas fa-shopping-cart me-2"></i>Select Package
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
 
+        <!-- Premium VIP -->
         <div class="col-md-4 mb-4">
-            <div class="card h-100" style="border: 2px solid #c4412b;">
+            <div class="card h-100" style="border: 2px solid var(--rust-primary);">
                 <div class="card-body text-center">
-                    <h3 class="card-title">Premium VIP</h3>
-                    <div class="price display-4 my-4" style="color: #c4412b;">$25</div>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Advanced Kit Command</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Home Commands (5)</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Priority Queue</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Skin Box Access</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Custom Chat Color</li>
+                    <div class="ribbon" style="position: absolute; top: 20px; right: -5px; padding: 5px 15px; background: var(--rust-primary); color: white; transform: rotate(45deg);">
+                        Popular
+                    </div>
+                    <h3 class="card-title mb-3">Premium VIP</h3>
+                    <div class="price display-4 my-4 text-glow" style="color: var(--rust-primary);">$25</div>
+                    <ul class="list-unstyled" style="color: rgba(255, 255, 255, 0.9);">
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Advanced Kit Command</li>
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Home Commands (5)</li>
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Priority Queue</li>
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Skin Box Access</li>
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Custom Chat Color</li>
                     </ul>
-                    <form action="{{ url_for('main.cart') }}" method="GET">
+                    <form action="{{ url_for('main.cart') }}" method="GET" class="mt-4">
                         <input type="hidden" name="package" value="premium">
                         <input type="hidden" name="amount" value="25">
-                        <button type="submit" class="btn btn-rust btn-lg w-100">Select Package</button>
+                        <button type="submit" class="btn btn-rust btn-lg w-100">
+                            <i class="fas fa-shopping-cart me-2"></i>Select Package
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
 
+        <!-- Elite VIP -->
         <div class="col-md-4 mb-4">
             <div class="card h-100">
                 <div class="card-body text-center">
-                    <h3 class="card-title">Elite VIP</h3>
-                    <div class="price display-4 my-4" style="color: #c4412b;">$50</div>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Elite Kit Command</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Home Commands (10)</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Priority Queue</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Skin Box Access</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Custom Chat Color</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Custom Join Message</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Discord Role</li>
+                    <h3 class="card-title mb-3">Elite VIP</h3>
+                    <div class="price display-4 my-4 text-glow" style="color: var(--rust-primary);">$50</div>
+                    <ul class="list-unstyled" style="color: rgba(255, 255, 255, 0.9);">
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Elite Kit Command</li>
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Home Commands (10)</li>
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Priority Queue</li>
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Skin Box Access</li>
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Custom Chat Color</li>
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Custom Join Message</li>
+                        <li class="mb-3"><i class="fas fa-check me-2" style="color: var(--rust-accent);"></i>Discord Role</li>
                     </ul>
-                    <form action="{{ url_for('main.cart') }}" method="GET">
+                    <form action="{{ url_for('main.cart') }}" method="GET" class="mt-4">
                         <input type="hidden" name="package" value="elite">
                         <input type="hidden" name="amount" value="50">
-                        <button type="submit" class="btn btn-rust btn-lg w-100">Select Package</button>
+                        <button type="submit" class="btn btn-rust btn-lg w-100">
+                            <i class="fas fa-shopping-cart me-2"></i>Select Package
+                        </button>
                     </form>
                 </div>
             </div>
