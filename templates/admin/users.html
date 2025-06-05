@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+
+{% block title %}Rust VIP - Kullanıcılar{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="admin-title">Kullanıcılar</h1>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="admin-sidebar">
+            <div class="admin-user-info">
+                <div class="admin-avatar">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="admin-user-details">
+                    <h5>{{ current_user.username }}</h5>
+                    <span class="admin-badge">Yönetici</span>
+                </div>
+            </div>
+            
+            <ul class="admin-nav">
+                <li>
+                    <a href="{{ url_for('admin') }}">
+                        <i class="fas fa-tachometer-alt"></i> Kontrol Paneli
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_orders') }}">
+                        <i class="fas fa-shopping-cart"></i> Siparişler
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_payment_settings') }}">
+                        <i class="fas fa-money-bill-wave"></i> Ödeme Ayarları
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="{{ url_for('admin_users') }}">
+                        <i class="fas fa-users"></i> Kullanıcılar
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_settings') }}">
+                        <i class="fas fa-cog"></i> Ayarlar
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('index') }}">
+                        <i class="fas fa-home"></i> Siteye Dön
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="admin-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3>Tüm Kullanıcılar</h3>
+                
+                <div class="user-filters">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary filter-btn active" data-filter="all">Tümü</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary filter-btn" data-filter="user">Normal</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger filter-btn" data-filter="admin">Yönetici</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table admin-table" id="users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Kullanıcı Adı</th>
+                            <th>E-posta</th>
+                            <th>Kayıt Tarihi</th>
+                            <th>Rol</th>
+                            <th>Sipariş Sayısı</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr class="user-row" data-role="{% if user.is_admin %}admin{% else %}user{% endif %}">
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.created_at.strftime('%d.%m.%Y %H:%M') if user.created_at else '-' }}</td>
+                                <td>
+                                    <span class="status-badge {% if user.is_admin %}status-admin{% else %}status-user{% endif %}">
+                                        {% if user.is_admin %}
+                                            Yönetici
+                                        {% else %}
+                                            Kullanıcı
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>{{ user.orders|length }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary view-user" data-id="{{ user.id }}">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-warning edit-user" data-id="{{ user.id }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    {% if not user.is_admin %}
+                                    <button class="btn btn-sm btn-danger delete-user" data-id="{{ user.id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kullanıcı Detay Modal -->
+<div class="modal fade" id="userDetailModal" tabindex="-1" role="dialog" aria-labelledby="userDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userDetailModalLabel">Kullanıcı Detayları</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="userDetailContent">
+                <!-- AJAX ile doldurulacak -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kullanıcı Düzenleme Modal -->
+<div class="modal fade" id="userEditModal" tabindex="-1" role="dialog" aria-labelledby="userEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userEditModalLabel">Kullanıcı Düzenle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm">
+                    <input type="hidden" id="editUserId" name="user_id">
+                    <div class="form-group">
+                        <label for="editUsername">Kullanıcı Adı</label>
+                        <input type="text" class="form-control" id="editUsername" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail">E-posta</label>
+                        <input type="email" class="form-control" id="editEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPassword">Yeni Şifre (Boş bırakılırsa değişmez)</label>
+                        <input type="password" class="form-control" id="editPassword" name="password">
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="editIsAdmin" name="is_admin">
+                        <label class="form-check-label" for="editIsAdmin">Yönetici</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="saveUserChanges">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .status-admin {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .status-user {
+        background-color: #007bff;
+        color: white;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filtreleme işlevi
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const userRows = document.querySelectorAll('.user-row');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const filter = this.getAttribute('data-filter');
+                
+                // Aktif buton sınıfını değiştir
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Satırları filtrele
+                userRows.forEach(row => {
+                    if (filter === 'all' || row.getAttribute('data-role') === filter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // Kullanıcı detaylarını görüntüleme
+        document.querySelectorAll('.view-user').forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.getAttribute('data-id');
+                // Burada AJAX ile kullanıcı detayları alınabilir
+                // Şimdilik basit bir mesaj gösterelim
+                document.getElementById('userDetailContent').innerHTML = `<p>Kullanıcı ID: ${userId} detayları yükleniyor...</p>`;
+                $('#userDetailModal').modal('show');
+            });
+        });
+        
+        // Kullanıcı düzenleme
+        document.querySelectorAll('.edit-user').forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.getAttribute('data-id');
+                const row = this.closest('tr');
+                const username = row.cells[1].textContent;
+                const email = row.cells[2].textContent;
+                const isAdmin = row.getAttribute('data-role') === 'admin';
+                
+                document.getElementById('editUserId').value = userId;
+                document.getElementById('editUsername').value = username;
+                document.getElementById('editEmail').value = email;
+                document.getElementById('editIsAdmin').checked = isAdmin;
+                document.getElementById('editPassword').value = '';
+                
+                $('#userEditModal').modal('show');
+            });
+        });
+        
+        // Kullanıcı silme
+        document.querySelectorAll('.delete-user').forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.getAttribute('data-id');
+                if (confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')) {
+                    // Burada AJAX ile silme işlemi yapılabilir
+                    alert(`Kullanıcı ID: ${userId} silme işlemi başlatıldı.`);
+                }
+            });
+        });
+        
+        // Kullanıcı değişikliklerini kaydetme
+        document.getElementById('saveUserChanges').addEventListener('click', function() {
+            const form = document.getElementById('editUserForm');
+            // Burada AJAX ile form verileri gönderilip kullanıcı güncellenebilir
+            alert('Kullanıcı bilgileri güncellendi.');
+            $('#userEditModal').modal('hide');
+        });
+    });
+</script>
+{% endblock %}

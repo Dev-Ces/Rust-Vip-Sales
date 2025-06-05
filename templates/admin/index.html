@@ -39,12 +39,12 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="{{ url_for('admin_users') }}">
                         <i class="fas fa-users"></i> Kullanıcılar
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="{{ url_for('admin_settings') }}">
                         <i class="fas fa-cog"></i> Ayarlar
                     </a>
                 </li>
@@ -381,8 +381,8 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Sayfa yüklendiğinde istatistikleri güncelle
-        updateStats();
+        // İstatistikleri güncelle
+        updateDashboardStats();
         
         // RCON durumunu kontrol et
         checkRconStatus();
@@ -392,21 +392,51 @@
         
         // Buton olayları
         document.getElementById('check-rcon-btn').addEventListener('click', checkRconStatus);
-        document.getElementById('refresh-stats-btn').addEventListener('click', updateStats);
+        document.getElementById('refresh-stats-btn').addEventListener('click', updateDashboardStats);
         document.getElementById('test-rcon-btn').addEventListener('click', testRconCommand);
         document.getElementById('clear-cache-btn').addEventListener('click', clearCache);
+        
+        // Her 60 saniyede bir istatistikleri güncelle
+        setInterval(updateDashboardStats, 60000);
+        
+        // Her 5 dakikada bir RCON durumunu kontrol et
+        setInterval(checkRconStatus, 300000);
     });
     
-    function updateStats() {
-        // Normalde burada bir AJAX isteği yapılır
-        // Şimdilik örnek verilerle dolduruyoruz
-        document.getElementById('pending-orders-count').textContent = '3';
-        document.getElementById('completed-orders-count').textContent = '12';
-        document.getElementById('player-count').textContent = '150';
+    function updateDashboardStats() {
+        // Bekleyen ve tamamlanan siparişleri almak için API isteği
+        fetch('/admin/orders')
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // Bekleyen siparişleri say
+                const pendingOrders = doc.querySelectorAll('.status-badge.status-pending').length;
+                document.getElementById('pending-orders-count').textContent = pendingOrders || '0';
+                
+                // Tamamlanan siparişleri say
+                const completedOrders = doc.querySelectorAll('.status-badge.status-completed').length;
+                document.getElementById('completed-orders-count').textContent = completedOrders || '0';
+            })
+            .catch(error => {
+                console.error('Sipariş istatistikleri alınamadı:', error);
+            });
+        
+        // RCON durumunu kontrol et ve oyuncu sayısını al
+        fetch('/api/rcon/status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('player-count').textContent = data.player_count;
+                }
+            })
+            .catch(error => {
+                console.error('Oyuncu sayısı alınamadı:', error);
+            });
     }
     
     function checkRconStatus() {
-        // RCON durumunu kontrol etme simülasyonu
         const statusIndicator = document.getElementById('rcon-status-indicator');
         const statusDot = statusIndicator.querySelector('.status-dot');
         const statusText = statusIndicator.querySelector('.status-text');
@@ -414,20 +444,27 @@
         statusDot.className = 'status-dot';
         statusText.textContent = 'Kontrol ediliyor...';
         
-        setTimeout(() => {
-            // Rastgele bir durum (gerçekte RCON bağlantısı kontrol edilir)
-            const isOnline = Math.random() > 0.3;
-            
-            if (isOnline) {
-                statusDot.className = 'status-dot online';
-                statusText.textContent = 'Çevrimiçi';
-            } else {
+        fetch('/api/rcon/status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    statusDot.className = 'status-dot online';
+                    statusText.textContent = 'Çevrimiçi';
+                } else {
+                    statusDot.className = 'status-dot offline';
+                    statusText.textContent = 'Çevrimdışı';
+                }
+                
+                // Sunucu bilgilerini güncelle
+                document.getElementById('rcon-server').textContent = data.server;
+                document.getElementById('rcon-port').textContent = data.port;
+                document.getElementById('rcon-last-check').textContent = data.last_check;
+            })
+            .catch(error => {
+                console.error('RCON durumu alınamadı:', error);
                 statusDot.className = 'status-dot offline';
-                statusText.textContent = 'Çevrimdışı';
-            }
-            
-            document.getElementById('rcon-last-check').textContent = new Date().toLocaleTimeString();
-        }, 1000);
+                statusText.textContent = 'Hata';
+            });
     }
     
     function loadRecentOrders() {
@@ -499,8 +536,29 @@
     }
     
     function testRconCommand() {
-        alert('RCON komutu test ediliyor...');
-        // Gerçek uygulamada burada bir AJAX isteği yapılır
+        const command = prompt('Test etmek istediğiniz RCON komutunu girin:', 'status');
+        
+        if (command) {
+            const formData = new FormData();
+            formData.append('command', command);
+            
+            fetch('/api/rcon/test', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Komut başarıyla çalıştırıldı!\n\nYanıt:\n' + data.response);
+                } else {
+                    alert('Komut çalıştırılamadı!\n\nHata:\n' + data.response);
+                }
+            })
+            .catch(error => {
+                console.error('RCON komutu test edilemedi:', error);
+                alert('RCON komutu test edilemedi: ' + error);
+            });
+        }
     }
     
     function clearCache() {

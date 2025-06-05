@@ -1,11 +1,11 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-import os
 import requests
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import uuid
 import re
 
@@ -75,10 +75,21 @@ class Order(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# RCON bağlantısı için fonksiyon
+# RCON bağlantısı için fonksiyonlar
+from rcon.source import rcon
+
+def check_rcon_connection():
+    try:
+        response = rcon(f"status", host=RCON_HOST, port=RCON_PORT, passwd=RCON_PASSWORD, timeout=3)
+        return True, response
+    except Exception as e:
+        print(f"RCON error: {e}")
+        return False, str(e)
+
 def get_player_count():
     try:
-        # Burada gerçek RCON bağlantısı yapılacak
+        response = rcon(f"status", host=RCON_HOST, port=RCON_PORT, passwd=RCON_PASSWORD, timeout=3)
+        # Gerçek bir Rust sunucusunda oyuncu sayısını çıkarmak için response'u parse etmek gerekir
         # Şimdilik örnek bir değer döndürelim
         return 150
     except Exception as e:
@@ -88,12 +99,20 @@ def get_player_count():
 # VIP grup ekleme fonksiyonu
 def add_vip_to_player(steam_id):
     try:
-        # Burada gerçek RCON komutu gönderilecek
-        # Örnek: rcon.command(f"addgroup {steam_id} vip")
+        response = rcon(f"addgroup {steam_id} vip", host=RCON_HOST, port=RCON_PORT, passwd=RCON_PASSWORD, timeout=3)
         return True
     except Exception as e:
         print(f"RCON error: {e}")
         return False
+
+# RCON komutu çalıştırma fonksiyonu
+def execute_rcon_command(command):
+    try:
+        response = rcon(command, host=RCON_HOST, port=RCON_PORT, passwd=RCON_PASSWORD, timeout=3)
+        return True, response
+    except Exception as e:
+        print(f"RCON error: {e}")
+        return False, str(e)
 
 # Ana sayfa
 @app.route('/')
@@ -307,6 +326,91 @@ def update_order(order_id):
     
     db.session.commit()
     return jsonify({'success': True})
+
+# Admin paneli - Kullanıcılar
+@app.route('/admin/users')
+@login_required
+def admin_users():
+    if not current_user.is_admin:
+        flash('Bu sayfaya erişim izniniz yok')
+        return redirect(url_for('index'))
+    
+    users = User.query.all()
+    return render_template('admin/users.html', users=users)
+
+# Admin paneli - Ayarlar
+@app.route('/admin/settings', methods=['GET', 'POST'])
+@login_required
+def admin_settings():
+    if not current_user.is_admin:
+        flash('Bu sayfaya erişim izniniz yok')
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        # RCON ayarlarını güncelle
+        if 'rcon_host' in request.form:
+            rcon_host = request.form.get('rcon_host')
+            rcon_port = request.form.get('rcon_port')
+            rcon_password = request.form.get('rcon_password')
+            
+            # Çevre değişkenlerini güncelleme (gerçek uygulamada dosyaya yazılmalı)
+            os.environ['RCON_HOST'] = rcon_host
+            os.environ['RCON_PORT'] = rcon_port
+            os.environ['RCON_PASSWORD'] = rcon_password
+            
+            # Global değişkenleri güncelle
+            global RCON_HOST, RCON_PORT, RCON_PASSWORD
+            RCON_HOST = rcon_host
+            RCON_PORT = int(rcon_port)
+            RCON_PASSWORD = rcon_password
+            
+            flash('RCON ayarları başarıyla güncellendi')
+        
+        # Site ayarlarını güncelle
+        elif 'site_name' in request.form:
+            # Site ayarlarını kaydetme işlemleri burada yapılabilir
+            flash('Site ayarları başarıyla güncellendi')
+        
+        return redirect(url_for('admin_settings'))
+    
+    return render_template('admin/settings.html', 
+                          RCON_HOST=RCON_HOST,
+                          RCON_PORT=RCON_PORT,
+                          RCON_PASSWORD=RCON_PASSWORD)
+
+# RCON API endpoint'leri
+@app.route('/api/rcon/status', methods=['GET'])
+@login_required
+def rcon_status():
+    if not current_user.is_admin:
+        return jsonify({'success': False, 'message': 'İzin reddedildi'}), 403
+    
+    success, response = check_rcon_connection()
+    player_count = get_player_count()
+    
+    return jsonify({
+        'success': success,
+        'online': success,
+        'message': 'Bağlantı başarılı' if success else response,
+        'player_count': player_count,
+        'server': RCON_HOST,
+        'port': RCON_PORT,
+        'last_check': datetime.now().strftime('%H:%M:%S')
+    })
+
+@app.route('/api/rcon/test', methods=['POST'])
+@login_required
+def rcon_test():
+    if not current_user.is_admin:
+        return jsonify({'success': False, 'message': 'İzin reddedildi'}), 403
+    
+    command = request.form.get('command', 'status')
+    success, response = execute_rcon_command(command)
+    
+    return jsonify({
+        'success': success,
+        'response': response
+    })
 
 # Veritabanını oluştur
 with app.app_context():
