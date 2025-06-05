@@ -13,7 +13,7 @@
         "Python 3.9": "ghcr.io/pterodactyl/yolks:python_3.9"
     },
     "file_denylist": [],
-    "startup": "pip install -r requirements.txt && python start.py",
+    "startup": "python start.py",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": [\"Running on\", \"* Running on\"]\r\n}",
@@ -22,7 +22,7 @@
     },
     "scripts": {
         "installation": {
-            "script": "#!\/bin\/bash\r\n\r\ncd \/mnt\/server\r\n\r\necho \"Installing Rust VIP Sales System...\"\r\n\r\n# Install git\r\napt-get update && apt-get install -y git\r\n\r\n# Clone repository\r\ngit clone https://github.com/Dev-Ces/Rust-Vip-Sales .\r\n\r\n# Create environment file\r\necho \"SECRET_KEY=change-this-to-a-secure-secret-key\" > .env\r\necho \"DATABASE_URL=sqlite:///app.db\" >> .env\r\necho \"ADMIN_USERNAME=admin\" >> .env\r\necho \"ADMIN_PASSWORD=change-this-to-a-secure-password\" >> .env\r\necho \"CRYPTO_ADDRESS=your-cryptocurrency-wallet-address\" >> .env\r\necho \"PORT=8080\" >> .env\r\n\r\necho \"Installation completed! You can now start the server.\"",
+            "script": "#!\/bin\/bash\r\n\r\ncd \/mnt\/server\r\n\r\necho \"Installing Rust VIP Sales System...\"\r\n\r\n# Install git\r\napk add --no-cache git\r\n\r\n# Clone repository\r\ngit clone https://github.com/Dev-Ces/Rust-Vip-Sales .\r\n\r\n# Create environment file\r\necho \"SECRET_KEY=change-this-to-a-secure-secret-key\" > .env\r\necho \"DATABASE_URL=sqlite:///app.db\" >> .env\r\necho \"ADMIN_USERNAME=admin\" >> .env\r\necho \"ADMIN_PASSWORD=change-this-to-a-secure-password\" >> .env\r\necho \"CRYPTO_ADDRESS=your-cryptocurrency-wallet-address\" >> .env\r\necho \"PORT=8080\" >> .env\r\n\r\necho \"Installation completed! You can now start the server.\"",
             "container": "python:3.9-slim",
             "entrypoint": "bash"
         }
