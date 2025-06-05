@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - Rust VIP Sales{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="text-center mb-4">Checkout</h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h4>Order Summary</h4>
+                        <ul class="list-unstyled">
+                            <li>Product: VIP Package</li>
+                            <li>Price: €5.00</li>
+                            <li>Duration: 30 days</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Your Information</h4>
+                        <ul class="list-unstyled">
+                            <li>Username: {{ current_user.username }}</li>
+                            <li>Steam ID: {{ current_user.steam_id }}</li>
+                            <li>Discord ID: {{ current_user.discord_id }}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <h4 class="alert-heading">Payment Instructions</h4>
+                    <p>Please send the exact amount to the following cryptocurrency address:</p>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" value="{{ config['CRYPTO_ADDRESS'] }}" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this)">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <p class="mb-0">
+                        <strong>Amount to send: €5.00</strong><br>
+                        After sending the payment, click the button below to complete your order.
+                    </p>
+                </div>
+
+                <form method="POST" class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        Complete Order <i class="fas fa-check ms-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyToClipboard(button) {
+    const input = button.parentElement.querySelector('input');
+    input.select();
+    document.execCommand('copy');
+    
+    const icon = button.querySelector('i');
+    icon.className = 'fas fa-check';
+    setTimeout(() => {
+        icon.className = 'fas fa-copy';
+    }, 2000);
+}
+</script>
+{% endblock %} 

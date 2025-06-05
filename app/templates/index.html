@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Rust VIP Sales{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 text-center">
+        <h1 class="display-4 glow mb-4">Welcome to Rust VIP Sales</h1>
+        <p class="lead mb-4">Get exclusive VIP benefits on our Rust server!</p>
+        
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <i class="fas fa-users fa-3x mb-3 text-info"></i>
+                        <h3>Online Players</h3>
+                        <div class="display-4 mb-3">{{ player_count }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <i class="fas fa-crown fa-3x mb-3 text-warning"></i>
+                        <h3>VIP Benefits</h3>
+                        <ul class="list-unstyled">
+                            <li>✨ Colored Name</li>
+                            <li>🎯 Queue Skip</li>
+                            <li>⚡ VIP Permissions</li>
+                            <li>🎭 Discord Role</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="{{ url_for('main.shop') }}" class="btn btn-primary btn-lg">
+            Get VIP Now <i class="fas fa-arrow-right ms-2"></i>
+        </a>
+    </div>
+</div>
+{% endblock %} 
