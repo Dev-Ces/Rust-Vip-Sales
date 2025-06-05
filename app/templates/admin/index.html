@@ -2,89 +2,200 @@
 
 {% block content %}
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Admin Dashboard</h2>
-        <a href="{{ url_for('admin.settings') }}" class="btn btn-outline-light">
-            <i class="fas fa-cog"></i> Settings
-        </a>
-    </div>
+    <!-- Hero Section -->
+    <div class="row justify-content-center">
+        <div class="col-md-12 text-center">
+            <div class="hero-section mb-5 fade-in-up">
+                <h1 class="display-2 mb-4 text-glow" style="font-family: 'Orbitron', monospace; font-weight: 900; background: linear-gradient(135deg, #c4412b, #ff6b3d, #ffd700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    RUST VIP SALES
+                </h1>
+                <p class="lead mb-5" style="font-size: 1.4rem; font-weight: 300; color: rgba(255, 255, 255, 0.9);">
+                    Elevate your Rust experience with exclusive VIP privileges
+                </p>
+                
+                <!-- Player Count Card -->
+                <div class="player-count-section mb-5">
+                    <div class="card mx-auto" style="max-width: 400px; background: linear-gradient(135deg, rgba(45, 45, 45, 0.9), rgba(196, 65, 43, 0.1)); border: 2px solid rgba(196, 65, 43, 0.3);">
+                        <div class="card-body text-center py-4">
+                            <h3 class="card-title mb-3" style="color: #ffd700;">
+                                <i class="fas fa-users me-2"></i>Players Online
+                            </h3>
+                            <div class="display-1 mb-3" style="font-family: 'Orbitron', monospace; font-weight: 900; background: linear-gradient(135deg, #c4412b, #ff6b3d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0 0 30px rgba(196, 65, 43, 0.5);">
+                                {{ stats.player_count if stats else 0 }}
+                            </div>
+                            <div class="pulse-animation" style="width: 80px; height: 4px; background: linear-gradient(90deg, #c4412b, #ff6b3d); margin: 0 auto; border-radius: 2px; animation: pulse-width 2s ease-in-out infinite;"></div>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <h3 class="card-title mb-4">Recent Orders</h3>
-            <div class="table-responsive">
-                <table class="table table-dark table-hover">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Steam ID</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Created</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for order in orders %}
-                        <tr>
-                            <td>#{{ order.id }}</td>
-                            <td>{{ order.steam_id }}</td>
-                            <td>${{ order.amount }}</td>
-                            <td>
-                                {% if order.status == 'pending' %}
-                                <span class="badge bg-warning">Pending</span>
-                                {% elif order.status == 'completed' %}
-                                <span class="badge bg-success">Completed</span>
-                                {% else %}
-                                <span class="badge bg-danger">Cancelled</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                            <td>
-                                <a href="{{ url_for('admin.order_detail', order_id=order.id) }}" class="btn btn-sm btn-outline-light">
-                                    <i class="fas fa-eye"></i> View
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <!-- CTA Buttons -->
+                {% if not current_user.is_authenticated %}
+                <div class="cta-buttons mb-5">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-rust btn-lg me-3" style="padding: 15px 40px; font-size: 1.2rem;">
+                        <i class="fas fa-user-plus me-2"></i>Register Now
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg" style="padding: 15px 40px; font-size: 1.2rem; border: 2px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px);">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                </div>
+                {% else %}
+                <div class="cta-buttons mb-5">
+                    <a href="{{ url_for('main.shop') }}" class="btn btn-rust btn-lg" style="padding: 15px 40px; font-size: 1.2rem;">
+                        <i class="fas fa-shopping-cart me-2"></i>Browse VIP Packages
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Statistics</h4>
-                    <div class="list-group">
-                        <div class="list-group-item bg-dark">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span>Total Orders</span>
-                                <span class="badge bg-rust rounded-pill">{{ orders|length }}</span>
-                            </div>
+    <!-- Features Section -->
+    <div class="features-section mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 feature-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-crown fa-4x" style="color: #ffd700; filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));"></i>
                         </div>
-                        <div class="list-group-item bg-dark">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span>Pending Orders</span>
-                                <span class="badge bg-warning rounded-pill">
-                                    {{ orders|selectattr('status', 'equalto', 'pending')|list|length }}
-                                </span>
-                            </div>
+                        <h3 class="mb-3" style="color: #ffd700; font-weight: 700;">VIP Benefits</h3>
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
+                            Unlock exclusive commands, priority access, and special privileges that set you apart from regular players.
+                        </p>
+                        <div class="feature-highlight mt-3">
+                            <small style="color: var(--rust-primary); font-weight: 600;">
+                                <i class="fas fa-star me-1"></i>Premium Experience
+                            </small>
                         </div>
-                        <div class="list-group-item bg-dark">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span>Completed Orders</span>
-                                <span class="badge bg-success rounded-pill">
-                                    {{ orders|selectattr('status', 'equalto', 'completed')|list|length }}
-                                </span>
-                            </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 feature-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-shield-alt fa-4x" style="color: #c4412b; filter: drop-shadow(0 0 20px rgba(196, 65, 43, 0.5));"></i>
+                        </div>
+                        <h3 class="mb-3" style="color: #c4412b; font-weight: 700;">Secure Payment</h3>
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
+                            Advanced cryptocurrency payment system ensuring your transactions are safe, secure, and anonymous.
+                        </p>
+                        <div class="feature-highlight mt-3">
+                            <small style="color: var(--rust-primary); font-weight: 600;">
+                                <i class="fas fa-lock me-1"></i>100% Secure
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 feature-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-headset fa-4x" style="color: #ff6b3d; filter: drop-shadow(0 0 20px rgba(255, 107, 61, 0.5));"></i>
+                        </div>
+                        <h3 class="mb-3" style="color: #ff6b3d; font-weight: 700;">24/7 Support</h3>
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
+                            Dedicated support team available around the clock to assist with any VIP-related questions or issues.
+                        </p>
+                        <div class="feature-highlight mt-3">
+                            <small style="color: var(--rust-primary); font-weight: 600;">
+                                <i class="fas fa-clock me-1"></i>Always Available
+                            </small>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Stats Section -->
+    <div class="stats-section mt-5 mb-5">
+        <div class="row text-center">
+            <div class="col-md-3 mb-4">
+                <div class="stat-item">
+                    <div class="stat-number" style="font-family: 'Orbitron', monospace; font-size: 2.5rem; font-weight: 900; color: #c4412b;">1000+</div>
+                    <div class="stat-label" style="color: rgba(255, 255, 255, 0.7);">Happy Customers</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-item">
+                    <div class="stat-number" style="font-family: 'Orbitron', monospace; font-size: 2.5rem; font-weight: 900; color: #ff6b3d;">24/7</div>
+                    <div class="stat-label" style="color: rgba(255, 255, 255, 0.7);">Support Available</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-item">
+                    <div class="stat-number" style="font-family: 'Orbitron', monospace; font-size: 2.5rem; font-weight: 900; color: #ffd700;">99.9%</div>
+                    <div class="stat-label" style="color: rgba(255, 255, 255, 0.7);">Uptime</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-item">
+                    <div class="stat-number" style="font-family: 'Orbitron', monospace; font-size: 2.5rem; font-weight: 900; color: #28a745;">5⭐</div>
+                    <div class="stat-label" style="color: rgba(255, 255, 255, 0.7);">Rating</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-{% endblock %} 
+
+<style>
+@keyframes pulse-width {
+    0%, 100% { width: 80px; }
+    50% { width: 120px; }
+}
+
+.feature-card {
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(196, 65, 43, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.feature-card:hover::before {
+    left: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-15px) scale(1.03);
+}
+
+.feature-icon {
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.stat-item {
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-5px);
+}
+
+.stat-item:hover .stat-number {
+    transform: scale(1.1);
+}
+
+.stat-number {
+    transition: all 0.3s ease;
+}
+</style>
+{% endblock %}
