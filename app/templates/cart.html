@@ -6,15 +6,15 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
-                    <h2 class="card-title text-center mb-4">Complete Your Order</h2>
+                    <h2 class="card-title text-center mb-4">Siparişi Tamamla</h2>
                     
                     <form action="{{ url_for('main.create_order') }}" method="POST" class="needs-validation" novalidate>
                         <input type="hidden" name="amount" value="{{ request.args.get('amount', 0) }}">
                         
                         <div class="mb-4">
-                            <h4>Selected Package</h4>
+                            <h4>Seçilen Paket</h4>
                             <div class="alert alert-secondary">
-                                {{ request.args.get('package', '').title() }} VIP Package
+                                {{ request.args.get('package', '').title() }} VIP Paketi
                                 <span class="float-end">${{ request.args.get('amount', 0) }}</span>
                             </div>
                         </div>
@@ -24,39 +24,49 @@
                             <div class="input-group">
                                 <input type="text" class="form-control" id="steam_id" name="steam_id" required
                                        pattern="[0-9]{17}"
-                                       placeholder="Enter your 17-digit Steam ID">
+                                       placeholder="17 haneli Steam ID'nizi girin">
                                 <button class="btn btn-outline-secondary" type="button" onclick="window.open('https://steamid.io', '_blank')">
-                                    Find Steam ID
+                                    Steam ID Bul
                                 </button>
                             </div>
                             <div class="form-text text-light">
-                                Your Steam ID is required to apply VIP benefits to your account.
+                                Steam ID'niz VIP özelliklerini hesabınıza tanımlamak için gereklidir.
                             </div>
                             <div class="invalid-feedback">
-                                Please enter a valid 17-digit Steam ID.
+                                Lütfen geçerli bir Steam ID girin (17 haneli numara).
                             </div>
                         </div>
 
                         <div class="mb-4">
-                            <h4>Payment Information</h4>
+                            <label for="steam_id_confirm" class="form-label">Steam ID (Tekrar)</label>
+                            <input type="text" class="form-control" id="steam_id_confirm" name="steam_id_confirm" required
+                                   pattern="[0-9]{17}"
+                                   placeholder="Steam ID'nizi tekrar girin">
+                            <div class="invalid-feedback">
+                                Steam ID'ler eşleşmiyor.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4>Ödeme Bilgileri</h4>
                             <div class="alert alert-info">
                                 <i class="fas fa-info-circle me-2"></i>
-                                Payment will be processed using cryptocurrency. You will receive the payment address after confirming your order.
+                                Ödeme kripto para ile yapılacaktır. Siparişinizi onayladıktan sonra ödeme adresini göreceksiniz.
                             </div>
                         </div>
 
                         <div class="form-check mb-4">
                             <input class="form-check-input" type="checkbox" id="terms" required>
                             <label class="form-check-label" for="terms">
-                                I agree to the terms and conditions
+                                Şartları ve koşulları kabul ediyorum
                             </label>
                             <div class="invalid-feedback">
-                                You must agree to the terms and conditions.
+                                Devam etmek için şartları ve koşulları kabul etmelisiniz.
                             </div>
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-rust btn-lg">Complete Order</button>
+                            <button type="submit" class="btn btn-rust btn-lg">Siparişi Tamamla</button>
                         </div>
                     </form>
                 </div>
@@ -71,15 +81,36 @@
 (function () {
     'use strict'
     var forms = document.querySelectorAll('.needs-validation')
+    var steamId = document.getElementById('steam_id')
+    var steamIdConfirm = document.getElementById('steam_id_confirm')
+
     Array.prototype.slice.call(forms).forEach(function (form) {
         form.addEventListener('submit', function (event) {
             if (!form.checkValidity()) {
                 event.preventDefault()
                 event.stopPropagation()
             }
+
+            if (steamId.value !== steamIdConfirm.value) {
+                steamIdConfirm.setCustomValidity('Steam ID\'ler eşleşmiyor')
+                event.preventDefault()
+                event.stopPropagation()
+            } else {
+                steamIdConfirm.setCustomValidity('')
+            }
+
             form.classList.add('was-validated')
         }, false)
     })
+
+    steamIdConfirm.addEventListener('input', function() {
+        if (steamId.value !== steamIdConfirm.value) {
+            steamIdConfirm.setCustomValidity('Steam ID\'ler eşleşmiyor')
+        } else {
+            steamIdConfirm.setCustomValidity('')
+        }
+    })
 })()
 </script>
+{% endblock %} 
 {% endblock %} 
