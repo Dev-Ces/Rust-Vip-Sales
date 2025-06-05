@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from flask_login import login_required, current_user
 from app import db
 from app.models import Order, ServerStats
-import requests
 from config import Config
 
 main = Blueprint('main', __name__)
@@ -20,22 +19,30 @@ def shop():
 @main.route('/cart')
 @login_required
 def cart():
+    amount = request.args.get('amount')
+    package = request.args.get('package')
+    if not amount or not package:
+        flash('Lütfen önce bir paket seçin.')
+        return redirect(url_for('main.shop'))
     return render_template('cart.html')
 
 @main.route('/create-order', methods=['POST'])
 @login_required
 def create_order():
     steam_id = request.form.get('steam_id')
+    steam_id_confirm = request.form.get('steam_id_confirm')
     amount = float(request.form.get('amount'))
     
-    # Validate Steam ID
-    try:
-        response = requests.get(f'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={Config.STEAM_API_KEY}&steamids={steam_id}')
-        if not response.json()['response']['players']:
-            flash('Invalid Steam ID')
-            return redirect(url_for('main.cart'))
-    except:
-        flash('Error validating Steam ID')
+    if not steam_id or not steam_id_confirm:
+        flash('Lütfen Steam ID\'nizi girin')
+        return redirect(url_for('main.cart'))
+    
+    if steam_id != steam_id_confirm:
+        flash('Steam ID\'ler eşleşmiyor. Lütfen kontrol edin.')
+        return redirect(url_for('main.cart'))
+    
+    if not steam_id.isdigit() or len(steam_id) != 17:
+        flash('Geçerli bir Steam ID girin (17 haneli numara)')
         return redirect(url_for('main.cart'))
     
     order = Order(
@@ -48,7 +55,7 @@ def create_order():
     db.session.add(order)
     db.session.commit()
     
-    flash('Order created successfully!')
+    flash('Siparişiniz başarıyla oluşturuldu!')
     return redirect(url_for('main.order_status', order_id=order.id))
 
 @main.route('/order/<int:order_id>')
@@ -56,7 +63,7 @@ def create_order():
 def order_status(order_id):
     order = Order.query.get_or_404(order_id)
     if order.user_id != current_user.id:
-        flash('Unauthorized access')
+        flash('Yetkisiz erişim')
         return redirect(url_for('main.index'))
     return render_template('order_status.html', order=order)
 
