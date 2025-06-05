@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block title %}Rust VIP - Ana Sayfa{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="overlay"></div>
+    <div class="hero-content text-center">
+        <h1 class="display-4 text-light">RUST VIP PAKETLERI</h1>
+        <p class="lead text-light">Sunucumuzda özel ayrıcalıklara sahip olun!</p>
+        <div class="player-count-box mt-4">
+            <h3>Aktif Oyuncu Sayısı</h3>
+            <div class="player-count">{{ player_count }}</div>
+        </div>
+        <a href="{{ url_for('vip') }}" class="btn btn-primary btn-lg mt-4">VIP Satın Al</a>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12 text-center">
+        <h2 class="section-title">VIP AYRICALIKLARI</h2>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-parachute-box"></i>
+            </div>
+            <h3>Özel Airdrop Çağırma</h3>
+            <p>VIP oyuncular özel komutla airdrop çağırabilir.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-home"></i>
+            </div>
+            <h3>Ekstra Ev Hakkı</h3>
+            <p>Normal oyunculara göre daha fazla ev kurma hakkı.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <h3>Hızlı Craft</h3>
+            <p>Eşyalarınızı daha hızlı üretin ve rakiplerinizin önüne geçin.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+            <h3>Özel Sohbet Rengi</h3>
+            <p>Sohbette özel renkli isminizle fark edilin.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <h3>Özel VIP Kiti</h3>
+            <p>Günlük olarak alınabilen özel VIP kiti.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-coins"></i>
+            </div>
+            <h3>Ekonomi Bonusu</h3>
+            <p>Sunucu ekonomisinde %10 bonus kazanç.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12 text-center">
+        <h2 class="section-title">NASIL VIP OLUNUR?</h2>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <h4>Hesap Oluştur</h4>
+            <p>Sitemizde bir hesap oluşturun veya giriş yapın.</p>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <h4>VIP Paketini Seç</h4>
+            <p>Size uygun VIP paketini seçin ve sepete ekleyin.</p>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <h4>Steam ID Girin</h4>
+            <p>Steam ID'nizi doğru şekilde girin.</p>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="step-card">
+            <div class="step-number">4</div>
+            <h4>Ödeme Yapın</h4>
+            <p>Kripto para ile ödemenizi yapın ve VIP olun!</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        position: relative;
+        background-image: url('{{ url_for("static", filename="img/rust-bg.jpg") }}');
+        background-size: cover;
+        background-position: center;
+        height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 40px;
+    }
+    
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        padding: 20px;
+    }
+    
+    .player-count-box {
+        background-color: rgba(0, 0, 0, 0.7);
+        display: inline-block;
+        padding: 15px 30px;
+        border-radius: 10px;
+        border: 2px solid #ff6b00;
+    }
+    
+    .player-count {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #ff6b00;
+    }
+    
+    .section-title {
+        color: #ff6b00;
+        font-weight: bold;
+        position: relative;
+        padding-bottom: 15px;
+    }
+    
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background-color: #ff6b00;
+    }
+    
+    .feature-card {
+        background-color: #1e2124;
+        border-radius: 10px;
+        padding: 25px;
+        height: 100%;
+        transition: transform 0.3s;
+        border: 1px solid #333;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        border-color: #ff6b00;
+    }
+    
+    .feature-icon {
+        font-size: 2.5rem;
+        color: #ff6b00;
+        margin-bottom: 15px;
+    }
+    
+    .step-card {
+        background-color: #1e2124;
+        border-radius: 10px;
+        padding: 25px;
+        height: 100%;
+        text-align: center;
+        position: relative;
+        border: 1px solid #333;
+        margin-bottom: 20px;
+    }
+    
+    .step-number {
+        background-color: #ff6b00;
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0 auto 15px;
+    }
+</style>
+{% endblock %}

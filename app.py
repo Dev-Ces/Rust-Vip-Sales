@@ -1,0 +1,258 @@
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+import os
+import requests
+import json
+from datetime import datetime
+import uuid
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'rustvipdevelopmentkey')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///rustvip.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+# RCON ayarları
+RCON_HOST = os.environ.get('RCON_HOST', 'localhost')
+RCON_PORT = int(os.environ.get('RCON_PORT', 28016))
+RCON_PASSWORD = os.environ.get('RCON_PASSWORD', 'yourpassword')
+
+# Veritabanı modelleri
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password_hash = db.Column(db.String(200), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+    orders = db.relationship('Order', backref='user', lazy=True)
+    
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+        
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    order_number = db.Column(db.String(50), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    steam_id = db.Column(db.String(20), nullable=False)
+    status = db.Column(db.String(20), default='pending')  # pending, completed, cancelled
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    payment_method = db.Column(db.String(50), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    
+    def generate_order_number(self):
+        self.order_number = f"RVS-{uuid.uuid4().hex[:8].upper()}"
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# RCON bağlantısı için fonksiyon
+def get_player_count():
+    try:
+        # Burada gerçek RCON bağlantısı yapılacak
+        # Şimdilik örnek bir değer döndürelim
+        return 150
+    except Exception as e:
+        print(f"RCON error: {e}")
+        return 0
+
+# VIP grup ekleme fonksiyonu
+def add_vip_to_player(steam_id):
+    try:
+        # Burada gerçek RCON komutu gönderilecek
+        # Örnek: rcon.command(f"addgroup {steam_id} vip")
+        return True
+    except Exception as e:
+        print(f"RCON error: {e}")
+        return False
+
+# Ana sayfa
+@app.route('/')
+def index():
+    player_count = get_player_count()
+    return render_template('index.html', player_count=player_count)
+
+# Kayıt sayfası
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        user_exists = User.query.filter_by(username=username).first()
+        email_exists = User.query.filter_by(email=email).first()
+        
+        if user_exists:
+            flash('Bu kullanıcı adı zaten kullanılıyor.')
+            return redirect(url_for('register'))
+        
+        if email_exists:
+            flash('Bu e-posta adresi zaten kullanılıyor.')
+            return redirect(url_for('register'))
+        
+        new_user = User(username=username, email=email)
+        new_user.set_password(password)
+        
+        db.session.add(new_user)
+        db.session.commit()
+        
+        flash('Hesabınız başarıyla oluşturuldu! Şimdi giriş yapabilirsiniz.')
+        return redirect(url_for('login'))
+    
+    return render_template('register.html')
+
+# Giriş sayfası
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        user = User.query.filter_by(username=username).first()
+        
+        if not user or not user.check_password(password):
+            flash('Geçersiz kullanıcı adı veya şifre')
+            return redirect(url_for('login'))
+        
+        login_user(user)
+        return redirect(url_for('index'))
+    
+    return render_template('login.html')
+
+# Çıkış
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+# VIP satın alma sayfası
+@app.route('/vip', methods=['GET'])
+@login_required
+def vip():
+    return render_template('vip.html')
+
+# Sepet sayfası
+@app.route('/cart', methods=['GET', 'POST'])
+@login_required
+def cart():
+    if request.method == 'POST':
+        steam_id = request.form.get('steam_id')
+        payment_method = request.form.get('payment_method')
+        
+        # Basit bir doğrulama
+        if not steam_id or len(steam_id) < 5:
+            flash('Geçersiz Steam ID')
+            return redirect(url_for('cart'))
+        
+        # Yeni sipariş oluştur
+        new_order = Order(
+            user_id=current_user.id,
+            steam_id=steam_id,
+            payment_method=payment_method,
+            amount=10.00  # Sabit fiyat
+        )
+        new_order.generate_order_number()
+        
+        db.session.add(new_order)
+        db.session.commit()
+        
+        return redirect(url_for('order_confirmation', order_id=new_order.id))
+    
+    return render_template('cart.html')
+
+# Sipariş onay sayfası
+@app.route('/order-confirmation/<int:order_id>')
+@login_required
+def order_confirmation(order_id):
+    order = Order.query.get_or_404(order_id)
+    
+    # Sadece kendi siparişlerini görebilir
+    if order.user_id != current_user.id and not current_user.is_admin:
+        flash('Bu sayfaya erişim izniniz yok')
+        return redirect(url_for('index'))
+    
+    return render_template('order_confirmation.html', order=order)
+
+# Kullanıcı siparişleri sayfası
+@app.route('/my-orders')
+@login_required
+def my_orders():
+    orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
+    return render_template('my_orders.html', orders=orders)
+
+# Admin paneli - Giriş kontrolü
+@app.route('/admin')
+@login_required
+def admin():
+    if not current_user.is_admin:
+        flash('Bu sayfaya erişim izniniz yok')
+        return redirect(url_for('index'))
+    
+    return render_template('admin/index.html')
+
+# Admin paneli - Tüm siparişler
+@app.route('/admin/orders')
+@login_required
+def admin_orders():
+    if not current_user.is_admin:
+        flash('Bu sayfaya erişim izniniz yok')
+        return redirect(url_for('index'))
+    
+    orders = Order.query.order_by(Order.created_at.desc()).all()
+    return render_template('admin/orders.html', orders=orders)
+
+# Admin paneli - Sipariş durumu güncelleme
+@app.route('/admin/orders/<int:order_id>/update', methods=['POST'])
+@login_required
+def update_order(order_id):
+    if not current_user.is_admin:
+        return jsonify({'success': False, 'message': 'İzin reddedildi'}), 403
+    
+    order = Order.query.get_or_404(order_id)
+    status = request.form.get('status')
+    
+    if status not in ['pending', 'completed', 'cancelled']:
+        return jsonify({'success': False, 'message': 'Geçersiz durum'}), 400
+    
+    order.status = status
+    
+    # Eğer sipariş tamamlandıysa, VIP grubunu ekle
+    if status == 'completed':
+        success = add_vip_to_player(order.steam_id)
+        if not success:
+            return jsonify({'success': False, 'message': 'RCON hatası, VIP eklenemedi'}), 500
+    
+    db.session.commit()
+    return jsonify({'success': True})
+
+# Veritabanını oluştur
+with app.app_context():
+    db.create_all()
+    
+    # Admin kullanıcısı oluştur (ilk çalıştırmada)
+    admin = User.query.filter_by(username='admin').first()
+    if not admin:
+        admin = User(username='admin', email='admin@rustvip.com', is_admin=True)
+        admin.set_password('adminpassword')
+        db.session.add(admin)
+        db.session.commit()
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)

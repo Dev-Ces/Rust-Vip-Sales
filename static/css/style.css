@@ -1,0 +1,196 @@
+/* Rust VIP Satış - Ana CSS Dosyası */
+
+/* Genel Stil */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #121416;
+    color: #fff;
+    line-height: 1.6;
+}
+
+.rust-theme {
+    background-color: #121416;
+    background-image: url('../img/rust-pattern.png');
+    background-repeat: repeat;
+    background-attachment: fixed;
+}
+
+/* Navbar */
+.navbar {
+    background-color: rgba(30, 33, 36, 0.95);
+    border-bottom: 2px solid #ff6b00;
+    padding: 15px 0;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: #ff6b00 !important;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand img {
+    margin-right: 10px;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: #ddd;
+    font-weight: 500;
+    padding: 10px 15px;
+    transition: color 0.3s;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:focus {
+    color: #ff6b00;
+}
+
+/* Butonlar */
+.btn-primary {
+    background-color: #ff6b00;
+    border-color: #ff6b00;
+    font-weight: 500;
+    padding: 10px 20px;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #e05e00;
+    border-color: #e05e00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+    background-color: #343a40;
+    border-color: #343a40;
+    font-weight: 500;
+    padding: 10px 20px;
+    transition: all 0.3s;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background-color: #23272b;
+    border-color: #23272b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Formlar */
+.form-control {
+    background-color: #1e2124;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 12px;
+}
+
+.form-control:focus {
+    background-color: #1e2124;
+    border-color: #ff6b00;
+    box-shadow: 0 0 0 0.25rem rgba(255, 107, 0, 0.25);
+    color: #fff;
+}
+
+.form-label {
+    color: #ddd;
+    font-weight: 500;
+}
+
+.form-text {
+    color: #aaa;
+}
+
+.form-check-input:checked {
+    background-color: #ff6b00;
+    border-color: #ff6b00;
+}
+
+/* Kartlar ve Bölümler */
+.section-title {
+    color: #ff6b00;
+    font-weight: bold;
+    position: relative;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.section-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: #ff6b00;
+}
+
+/* Footer */
+.footer {
+    background-color: rgba(30, 33, 36, 0.95);
+    color: #ddd;
+    border-top: 1px solid #333;
+}
+
+.footer h5 {
+    color: #ff6b00;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Uyarı Mesajları */
+.alert {
+    border-radius: 10px;
+    padding: 15px 20px;
+}
+
+.alert-info {
+    background-color: rgba(23, 162, 184, 0.1);
+    border-color: #17a2b8;
+    color: #17a2b8;
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Duyarlı Tasarım */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .navbar-brand img {
+        height: 30px;
+    }
+    
+    .hero-section {
+        height: 400px;
+    }
+    
+    .player-count {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section {
+        height: 350px;
+    }
+    
+    .player-count {
+        font-size: 2rem;
+    }
+    
+    .feature-card, .step-card {
+        margin-bottom: 20px;
+    }
+}

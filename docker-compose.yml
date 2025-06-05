@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    ports:
+      - "${PORT:-5000}:5000"
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    restart: unless-stopped
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+      - SECRET_KEY=${SECRET_KEY:-change_this_to_a_random_string}
+      - RCON_HOST=${RCON_HOST:-127.0.0.1}
+      - RCON_PORT=${RCON_PORT:-28016}
+      - RCON_PASSWORD=${RCON_PASSWORD:-your_rcon_password}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-changeme}
+      - BTC_ADDRESS=${BTC_ADDRESS:-1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa}
+      - ETH_ADDRESS=${ETH_ADDRESS:-0x0000000000000000000000000000000000000000}
+      - LTC_ADDRESS=${LTC_ADDRESS:-LTc1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa}

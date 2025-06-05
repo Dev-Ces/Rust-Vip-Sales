@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+
+{% block title %}Rust VIP - VIP Paketleri{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center">
+        <h1 class="page-title">VIP PAKETLERİ</h1>
+        <p class="lead">Size en uygun VIP paketini seçin ve Rust deneyiminizi bir üst seviyeye taşıyın!</p>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <!-- Standart VIP Paketi -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="package-card">
+            <div class="package-header">
+                <h3>Standart VIP</h3>
+                <div class="price">10 USD</div>
+                <div class="duration">30 Gün</div>
+            </div>
+            <div class="package-body">
+                <ul class="package-features">
+                    <li><i class="fas fa-check"></i> Özel Sohbet Rengi</li>
+                    <li><i class="fas fa-check"></i> Günlük VIP Kiti</li>
+                    <li><i class="fas fa-check"></i> 1 Ekstra Ev Hakkı</li>
+                    <li><i class="fas fa-check"></i> %10 Craft Hızı</li>
+                    <li><i class="fas fa-times"></i> Airdrop Çağırma</li>
+                    <li><i class="fas fa-times"></i> Ekonomi Bonusu</li>
+                </ul>
+                <form action="{{ url_for('cart') }}" method="GET">
+                    <input type="hidden" name="package" value="standard">
+                    <button type="submit" class="btn btn-primary btn-block">Sepete Ekle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Premium VIP Paketi -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="package-card featured">
+            <div class="package-badge">En Popüler</div>
+            <div class="package-header">
+                <h3>Premium VIP</h3>
+                <div class="price">20 USD</div>
+                <div class="duration">30 Gün</div>
+            </div>
+            <div class="package-body">
+                <ul class="package-features">
+                    <li><i class="fas fa-check"></i> Özel Sohbet Rengi</li>
+                    <li><i class="fas fa-check"></i> Gelişmiş VIP Kiti</li>
+                    <li><i class="fas fa-check"></i> 2 Ekstra Ev Hakkı</li>
+                    <li><i class="fas fa-check"></i> %20 Craft Hızı</li>
+                    <li><i class="fas fa-check"></i> Günlük 1 Airdrop Çağırma</li>
+                    <li><i class="fas fa-check"></i> %5 Ekonomi Bonusu</li>
+                </ul>
+                <form action="{{ url_for('cart') }}" method="GET">
+                    <input type="hidden" name="package" value="premium">
+                    <button type="submit" class="btn btn-primary btn-block">Sepete Ekle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Elite VIP Paketi -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="package-card">
+            <div class="package-header">
+                <h3>Elite VIP</h3>
+                <div class="price">30 USD</div>
+                <div class="duration">30 Gün</div>
+            </div>
+            <div class="package-body">
+                <ul class="package-features">
+                    <li><i class="fas fa-check"></i> Özel Sohbet Rengi + Prefix</li>
+                    <li><i class="fas fa-check"></i> Elite VIP Kiti</li>
+                    <li><i class="fas fa-check"></i> 3 Ekstra Ev Hakkı</li>
+                    <li><i class="fas fa-check"></i> %30 Craft Hızı</li>
+                    <li><i class="fas fa-check"></i> Günlük 2 Airdrop Çağırma</li>
+                    <li><i class="fas fa-check"></i> %10 Ekonomi Bonusu</li>
+                </ul>
+                <form action="{{ url_for('cart') }}" method="GET">
+                    <input type="hidden" name="package" value="elite">
+                    <button type="submit" class="btn btn-primary btn-block">Sepete Ekle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="info-card">
+            <h3><i class="fas fa-info-circle"></i> VIP Hakkında Bilmeniz Gerekenler</h3>
+            <ul>
+                <li>VIP paketleri satın alındıktan sonra otomatik olarak hesabınıza tanımlanır.</li>
+                <li>VIP süresi dolduğunda tüm ayrıcalıklarınız sona erer.</li>
+                <li>Paket süreleri satın alma tarihinden itibaren başlar.</li>
+                <li>Aynı anda birden fazla VIP paketi aktif olamaz.</li>
+                <li>Teknik bir sorun yaşarsanız Discord sunucumuzdan destek alabilirsiniz.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12 text-center">
+        <h2 class="section-title">SIKÇA SORULAN SORULAR</h2>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="faq-item">
+            <h4>VIP paketimi nasıl aktifleştirebilirim?</h4>
+            <p>Ödemeniz onaylandıktan sonra VIP paketiniz otomatik olarak Steam ID'nize tanımlanacaktır. Sunucuya giriş yaptığınızda VIP ayrıcalıklarınız aktif olacaktır.</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="faq-item">
+            <h4>Ödeme yöntemleri nelerdir?</h4>
+            <p>Şu anda sadece kripto para ile ödeme kabul ediyoruz. Bitcoin, Ethereum ve diğer popüler kripto paralar ile ödeme yapabilirsiniz.</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="faq-item">
+            <h4>VIP paketimi yükseltebilir miyim?</h4>
+            <p>Evet, mevcut paketinizi daha yüksek bir pakete yükseltebilirsiniz. Yükseltme işlemi için destek ekibimizle iletişime geçmeniz gerekmektedir.</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="faq-item">
+            <h4>VIP komutlarını nasıl kullanabilirim?</h4>
+            <p>Sunucuya giriş yaptıktan sonra sohbete /viphelp yazarak tüm VIP komutlarını ve kullanımlarını görebilirsiniz.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-title {
+        color: #ff6b00;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    
+    .package-card {
+        background-color: #1e2124;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 100%;
+        border: 1px solid #333;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .package-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .package-card.featured {
+        border: 2px solid #ff6b00;
+        position: relative;
+        transform: scale(1.05);
+    }
+    
+    .package-card.featured:hover {
+        transform: scale(1.05) translateY(-10px);
+    }
+    
+    .package-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: #ff6b00;
+        color: white;
+        padding: 5px 15px;
+        font-weight: bold;
+        font-size: 0.8rem;
+        border-bottom-left-radius: 10px;
+    }
+    
+    .package-header {
+        background-color: #121416;
+        padding: 20px;
+        text-align: center;
+        border-bottom: 1px solid #333;
+    }
+    
+    .package-header h3 {
+        margin: 0;
+        color: #ff6b00;
+    }
+    
+    .price {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+    
+    .duration {
+        font-size: 0.9rem;
+        color: #aaa;
+    }
+    
+    .package-body {
+        padding: 20px;
+    }
+    
+    .package-features {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+    
+    .package-features li {
+        padding: 8px 0;
+        border-bottom: 1px solid #333;
+    }
+    
+    .package-features li:last-child {
+        border-bottom: none;
+    }
+    
+    .package-features .fa-check {
+        color: #28a745;
+        margin-right: 10px;
+    }
+    
+    .package-features .fa-times {
+        color: #dc3545;
+        margin-right: 10px;
+    }
+    
+    .btn-block {
+        width: 100%;
+    }
+    
+    .info-card {
+        background-color: #1e2124;
+        border-radius: 10px;
+        padding: 20px;
+        border: 1px solid #333;
+    }
+    
+    .info-card h3 {
+        color: #ff6b00;
+        margin-bottom: 15px;
+    }
+    
+    .info-card ul {
+        padding-left: 20px;
+    }
+    
+    .info-card li {
+        margin-bottom: 10px;
+    }
+    
+    .faq-item {
+        background-color: #1e2124;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #333;
+    }
+    
+    .faq-item h4 {
+        color: #ff6b00;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
