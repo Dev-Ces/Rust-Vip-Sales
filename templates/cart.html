@@ -16,41 +16,23 @@
             <h3>Sipariş Detayları</h3>
             
             <div class="cart-item">
-                {% if request.args.get('package') == 'standard' %}
-                    <div class="item-name">Standart VIP Paketi</div>
-                    <div class="item-price">10 USD</div>
-                    <input type="hidden" id="package-price" value="10">
-                    <input type="hidden" id="package-name" value="Standart VIP Paketi">
-                {% elif request.args.get('package') == 'premium' %}
-                    <div class="item-name">Premium VIP Paketi</div>
-                    <div class="item-price">20 USD</div>
-                    <input type="hidden" id="package-price" value="20">
-                    <input type="hidden" id="package-name" value="Premium VIP Paketi">
-                {% elif request.args.get('package') == 'elite' %}
-                    <div class="item-name">Elite VIP Paketi</div>
-                    <div class="item-price">30 USD</div>
-                    <input type="hidden" id="package-price" value="30">
-                    <input type="hidden" id="package-name" value="Elite VIP Paketi">
+                {% if request.args.get('package') == 'vip' %}
+                    <div class="item-name">Rust VIP Paketi</div>
+                    <div class="item-price">5 EUR</div>
+                    <input type="hidden" id="package-price" value="5">
+                    <input type="hidden" id="package-name" value="Rust VIP Paketi">
                 {% else %}
-                    <div class="item-name">Standart VIP Paketi</div>
-                    <div class="item-price">10 USD</div>
-                    <input type="hidden" id="package-price" value="10">
-                    <input type="hidden" id="package-name" value="Standart VIP Paketi">
+                    <div class="item-name">Rust VIP Paketi</div>
+                    <div class="item-price">5 EUR</div>
+                    <input type="hidden" id="package-price" value="5">
+                    <input type="hidden" id="package-name" value="Rust VIP Paketi">
                 {% endif %}
             </div>
             
             <div class="cart-total">
                 <div class="total-label">Toplam:</div>
                 <div class="total-price" id="total-price">
-                    {% if request.args.get('package') == 'standard' %}
-                        10 USD
-                    {% elif request.args.get('package') == 'premium' %}
-                        20 USD
-                    {% elif request.args.get('package') == 'elite' %}
-                        30 USD
-                    {% else %}
-                        10 USD
-                    {% endif %}
+                    {{ vip_price }} EUR
                 </div>
             </div>
         </div>

@@ -11,76 +11,26 @@
 </div>
 
 <div class="row mt-5">
-    <!-- Standart VIP Paketi -->
-    <div class="col-lg-4 col-md-6 mb-4">
-        <div class="package-card">
-            <div class="package-header">
-                <h3>Standart VIP</h3>
-                <div class="price">10 USD</div>
-                <div class="duration">30 Gün</div>
-            </div>
-            <div class="package-body">
-                <ul class="package-features">
-                    <li><i class="fas fa-check"></i> Özel Sohbet Rengi</li>
-                    <li><i class="fas fa-check"></i> Günlük VIP Kiti</li>
-                    <li><i class="fas fa-check"></i> 1 Ekstra Ev Hakkı</li>
-                    <li><i class="fas fa-check"></i> %10 Craft Hızı</li>
-                    <li><i class="fas fa-times"></i> Airdrop Çağırma</li>
-                    <li><i class="fas fa-times"></i> Ekonomi Bonusu</li>
-                </ul>
-                <form action="{{ url_for('cart') }}" method="GET">
-                    <input type="hidden" name="package" value="standard">
-                    <button type="submit" class="btn btn-primary btn-block">Sepete Ekle</button>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Premium VIP Paketi -->
-    <div class="col-lg-4 col-md-6 mb-4">
+    <!-- VIP Paketi -->
+    <div class="col-lg-6 col-md-8 mx-auto mb-4">
         <div class="package-card featured">
-            <div class="package-badge">En Popüler</div>
+            <div class="package-badge">VIP</div>
             <div class="package-header">
-                <h3>Premium VIP</h3>
-                <div class="price">20 USD</div>
+                <h3>Rust VIP</h3>
+                <div class="price">{{ vip_price }} EUR</div>
                 <div class="duration">30 Gün</div>
             </div>
             <div class="package-body">
                 <ul class="package-features">
                     <li><i class="fas fa-check"></i> Özel Sohbet Rengi</li>
-                    <li><i class="fas fa-check"></i> Gelişmiş VIP Kiti</li>
-                    <li><i class="fas fa-check"></i> 2 Ekstra Ev Hakkı</li>
-                    <li><i class="fas fa-check"></i> %20 Craft Hızı</li>
-                    <li><i class="fas fa-check"></i> Günlük 1 Airdrop Çağırma</li>
-                    <li><i class="fas fa-check"></i> %5 Ekonomi Bonusu</li>
+                    <li><i class="fas fa-check"></i> VIP Kiti</li>
+                    <li><i class="fas fa-check"></i> Ekstra Ev Hakkı</li>
+                    <li><i class="fas fa-check"></i> Craft Hızı Bonusu</li>
+                    <li><i class="fas fa-check"></i> Özel VIP Komutları</li>
+                    <li><i class="fas fa-check"></i> VIP Sunucu Slotu</li>
                 </ul>
                 <form action="{{ url_for('cart') }}" method="GET">
-                    <input type="hidden" name="package" value="premium">
-                    <button type="submit" class="btn btn-primary btn-block">Sepete Ekle</button>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Elite VIP Paketi -->
-    <div class="col-lg-4 col-md-6 mb-4">
-        <div class="package-card">
-            <div class="package-header">
-                <h3>Elite VIP</h3>
-                <div class="price">30 USD</div>
-                <div class="duration">30 Gün</div>
-            </div>
-            <div class="package-body">
-                <ul class="package-features">
-                    <li><i class="fas fa-check"></i> Özel Sohbet Rengi + Prefix</li>
-                    <li><i class="fas fa-check"></i> Elite VIP Kiti</li>
-                    <li><i class="fas fa-check"></i> 3 Ekstra Ev Hakkı</li>
-                    <li><i class="fas fa-check"></i> %30 Craft Hızı</li>
-                    <li><i class="fas fa-check"></i> Günlük 2 Airdrop Çağırma</li>
-                    <li><i class="fas fa-check"></i> %10 Ekonomi Bonusu</li>
-                </ul>
-                <form action="{{ url_for('cart') }}" method="GET">
-                    <input type="hidden" name="package" value="elite">
+                    <input type="hidden" name="package" value="vip">
                     <button type="submit" class="btn btn-primary btn-block">Sepete Ekle</button>
                 </form>
             </div>

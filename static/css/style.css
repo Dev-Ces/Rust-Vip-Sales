@@ -162,6 +162,95 @@ body {
     animation: fadeIn 0.5s ease-in-out;
 }
 
+/* Admin Paneli Stilleri */
+.admin-title {
+    color: #ff6b00;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.admin-sidebar {
+    background-color: #1e2124;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #333;
+    height: 100%;
+    position: sticky;
+    top: 20px;
+}
+
+.admin-user-info {
+    display: flex;
+    align-items: center;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #333;
+}
+
+.admin-avatar {
+    width: 50px;
+    height: 50px;
+    background-color: #ff6b00;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.admin-user-details h5 {
+    margin: 0;
+    color: #fff;
+}
+
+.admin-badge {
+    background-color: #ff6b00;
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+.admin-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.admin-nav li {
+    margin-bottom: 10px;
+}
+
+.admin-nav li a {
+    display: flex;
+    align-items: center;
+    color: #ddd;
+    text-decoration: none;
+    padding: 10px;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.admin-nav li a:hover {
+    background-color: #121416;
+    color: #ff6b00;
+}
+
+.admin-nav li.active a {
+    background-color: #ff6b00;
+    color: #fff;
+}
+
+.admin-nav li a i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
 /* Duyarlı Tasarım */
 @media (max-width: 768px) {
     .navbar-brand {

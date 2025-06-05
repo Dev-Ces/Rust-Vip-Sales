@@ -196,12 +196,17 @@ def logout():
 @app.route('/vip', methods=['GET'])
 @login_required
 def vip():
-    return render_template('vip.html')
+    # VIP fiyatını çevre değişkeninden al (varsayılan: 5)
+    vip_price = float(os.environ.get('VIP_PRICE', '5'))
+    return render_template('vip.html', vip_price=vip_price)
 
 # Sepet sayfası
 @app.route('/cart', methods=['GET', 'POST'])
 @login_required
 def cart():
+    # VIP fiyatını çevre değişkeninden al (varsayılan: 5)
+    vip_price = float(os.environ.get('VIP_PRICE', '5'))
+    
     if request.method == 'POST':
         steam_id = request.form.get('steam_id')
         payment_method = request.form.get('payment_method')
@@ -216,7 +221,7 @@ def cart():
             user_id=current_user.id,
             steam_id=steam_id,
             payment_method=payment_method,
-            amount=10.00  # Sabit fiyat
+            amount=vip_price  # Yapılandırılabilir fiyat
         )
         new_order.generate_order_number()
         
@@ -225,7 +230,7 @@ def cart():
         
         return redirect(url_for('order_confirmation', order_id=new_order.id))
     
-    return render_template('cart.html')
+    return render_template('cart.html', vip_price=vip_price)
 
 # Sipariş onay sayfası
 @app.route('/order-confirmation/<int:order_id>')
@@ -357,6 +362,9 @@ def admin_settings():
         flash('Bu sayfaya erişim izniniz yok')
         return redirect(url_for('index'))
     
+    # VIP fiyatını çevre değişkeninden al (varsayılan: 5)
+    vip_price = os.environ.get('VIP_PRICE', '5')
+    
     if request.method == 'POST':
         # RCON ayarlarını güncelle
         if 'rcon_host' in request.form:
@@ -377,6 +385,16 @@ def admin_settings():
             
             flash('RCON ayarları başarıyla güncellendi')
         
+        # VIP ayarlarını güncelle
+        elif 'vip_price' in request.form:
+            new_vip_price = request.form.get('vip_price')
+            
+            # Çevre değişkenini güncelle
+            os.environ['VIP_PRICE'] = new_vip_price
+            vip_price = new_vip_price
+            
+            flash('VIP ayarları başarıyla güncellendi')
+        
         # Site ayarlarını güncelle
         elif 'site_name' in request.form:
             # Site ayarlarını kaydetme işlemleri burada yapılabilir
@@ -387,7 +405,8 @@ def admin_settings():
     return render_template('admin/settings.html', 
                           RCON_HOST=RCON_HOST,
                           RCON_PORT=RCON_PORT,
-                          RCON_PASSWORD=RCON_PASSWORD)
+                          RCON_PASSWORD=RCON_PASSWORD,
+                          vip_price=vip_price)
 
 # RCON API endpoint'leri
 @app.route('/api/rcon/status', methods=['GET'])
@@ -417,6 +436,10 @@ def rcon_test():
     
     command = request.form.get('command', 'status')
     success, response = execute_rcon_command(command)
+    
+    # HTML içeriği olabilecek karakterleri temizle
+    if isinstance(response, str):
+        response = response.replace('<', '&lt;').replace('>', '&gt;')
     
     return jsonify({
         'success': success,
