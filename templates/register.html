@@ -1,0 +1,477 @@
+{% extends "base.html" %}
+
+{% block title %}Kayıt Ol - Rust VIP Sales{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 0;
+    }
+
+    .auth-card {
+        max-width: 450px;
+        width: 100%;
+        background: var(--card-bg);
+        border: 1px solid rgba(57, 255, 20, 0.3);
+        border-radius: 20px;
+        backdrop-filter: blur(15px);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--neon-green), var(--neon-blue), var(--rust-orange), var(--neon-green));
+        background-size: 200% 100%;
+        animation: gradient-shift 3s ease infinite;
+    }
+
+    @keyframes gradient-shift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .auth-header {
+        text-align: center;
+        padding: 40px 40px 20px;
+        background: linear-gradient(135deg, rgba(57, 255, 20, 0.1) 0%, rgba(0, 191, 255, 0.1) 100%);
+    }
+
+    .auth-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--neon-green);
+        text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        margin-bottom: 10px;
+    }
+
+    .auth-subtitle {
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 0;
+    }
+
+    .auth-body {
+        padding: 30px 40px 40px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+    .form-label {
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: #fff;
+        padding: 12px 45px 12px 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--neon-green);
+        box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .input-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 1.1rem;
+        pointer-events: none;
+        transition: color 0.3s ease;
+    }
+
+    .form-control:focus + .input-icon {
+        color: var(--neon-green);
+    }
+
+    .btn-auth {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(45deg, var(--neon-green), #32CD32);
+        color: #000;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-auth::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-auth:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(57, 255, 20, 0.4);
+        background: linear-gradient(45deg, #32CD32, var(--neon-green));
+        color: #000;
+    }
+
+    .btn-auth:hover::before {
+        left: 100%;
+    }
+
+    .auth-divider {
+        text-align: center;
+        margin: 30px 0;
+        position: relative;
+    }
+
+    .auth-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    }
+
+    .auth-divider span {
+        background: var(--card-bg);
+        padding: 0 20px;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.9rem;
+    }
+
+    .auth-link {
+        color: var(--rust-orange);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .auth-link:hover {
+        color: #fff;
+        text-shadow: 0 0 10px var(--rust-orange);
+    }
+
+    .password-strength {
+        margin-top: 8px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .password-strength-bar {
+        height: 100%;
+        width: 0;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .strength-weak { background: #ff4444; width: 25%; }
+    .strength-fair { background: #ffaa00; width: 50%; }
+    .strength-good { background: #00aaff; width: 75%; }
+    .strength-strong { background: var(--neon-green); width: 100%; }
+
+    .password-requirements {
+        margin-top: 10px;
+        font-size: 0.85rem;
+    }
+
+    .requirement {
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 5px;
+        transition: color 0.3s ease;
+    }
+
+    .requirement.met {
+        color: var(--neon-green);
+    }
+
+    .requirement i {
+        margin-right: 8px;
+        width: 12px;
+    }
+
+    @media (max-width: 576px) {
+        .auth-card {
+            margin: 20px;
+            border-radius: 15px;
+        }
+        
+        .auth-header,
+        .auth-body {
+            padding: 30px 25px;
+        }
+        
+        .auth-title {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="auth-title">
+                <i class="fas fa-user-plus"></i> KAYIT OL
+            </h1>
+            <p class="auth-subtitle">Yeni hesap oluşturun</p>
+        </div>
+        
+        <div class="auth-body">
+            <form method="POST" id="registerForm">
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        <i class="fas fa-user"></i> Kullanıcı Adı
+                    </label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="username" 
+                           name="username" 
+                           placeholder="Kullanıcı adınızı girin"
+                           minlength="3"
+                           maxlength="20"
+                           required>
+                    <i class="fas fa-user input-icon"></i>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope"></i> E-posta
+                    </label>
+                    <input type="email" 
+                           class="form-control" 
+                           id="email" 
+                           name="email" 
+                           placeholder="E-posta adresinizi girin"
+                           required>
+                    <i class="fas fa-envelope input-icon"></i>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock"></i> Şifre
+                    </label>
+                    <input type="password" 
+                           class="form-control" 
+                           id="password" 
+                           name="password" 
+                           placeholder="Güçlü bir şifre oluşturun"
+                           minlength="6"
+                           required>
+                    <i class="fas fa-lock input-icon"></i>
+                    
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="strengthBar"></div>
+                    </div>
+                    
+                    <div class="password-requirements">
+                        <div class="requirement" id="req-length">
+                            <i class="fas fa-times"></i> En az 6 karakter
+                        </div>
+                        <div class="requirement" id="req-letter">
+                            <i class="fas fa-times"></i> En az bir harf
+                        </div>
+                        <div class="requirement" id="req-number">
+                            <i class="fas fa-times"></i> En az bir rakam
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm_password" class="form-label">
+                        <i class="fas fa-lock"></i> Şifre Tekrar
+                    </label>
+                    <input type="password" 
+                           class="form-control" 
+                           id="confirm_password" 
+                           name="confirm_password" 
+                           placeholder="Şifrenizi tekrar girin"
+                           required>
+                    <i class="fas fa-lock input-icon"></i>
+                </div>
+                
+                <button type="submit" class="btn btn-auth" id="submitBtn">
+                    <i class="fas fa-user-plus"></i> Hesap Oluştur
+                </button>
+            </form>
+            
+            <div class="auth-divider">
+                <span>veya</span>
+            </div>
+            
+            <div class="text-center">
+                <p class="mb-0">
+                    Zaten hesabınız var mı? 
+                    <a href="{{ url_for('login') }}" class="auth-link">
+                        <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('registerForm');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const strengthBar = document.getElementById('strengthBar');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        // Password strength checker
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            const strength = checkPasswordStrength(password);
+            updatePasswordStrength(strength);
+            updateRequirements(password);
+        });
+        
+        // Confirm password checker
+        confirmPasswordInput.addEventListener('input', function() {
+            const password = passwordInput.value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword.length > 0) {
+                if (password === confirmPassword) {
+                    this.style.borderColor = 'var(--neon-green)';
+                    this.nextElementSibling.style.color = 'var(--neon-green)';
+                } else {
+                    this.style.borderColor = '#ff4444';
+                    this.nextElementSibling.style.color = '#ff4444';
+                }
+            }
+        });
+        
+        function checkPasswordStrength(password) {
+            let score = 0;
+            
+            // Length check
+            if (password.length >= 6) score++;
+            if (password.length >= 8) score++;
+            
+            // Character variety
+            if (/[a-zA-Z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^a-zA-Z0-9]/.test(password)) score++;
+            
+            return Math.min(score, 4);
+        }
+        
+        function updatePasswordStrength(strength) {
+            const classes = ['strength-weak', 'strength-fair', 'strength-good', 'strength-strong'];
+            
+            strengthBar.className = 'password-strength-bar';
+            
+            if (strength > 0) {
+                strengthBar.classList.add(classes[strength - 1]);
+            }
+        }
+        
+        function updateRequirements(password) {
+            const requirements = {
+                'req-length': password.length >= 6,
+                'req-letter': /[a-zA-Z]/.test(password),
+                'req-number': /[0-9]/.test(password)
+            };
+            
+            Object.keys(requirements).forEach(reqId => {
+                const element = document.getElementById(reqId);
+                const icon = element.querySelector('i');
+                
+                if (requirements[reqId]) {
+                    element.classList.add('met');
+                    icon.className = 'fas fa-check';
+                } else {
+                    element.classList.remove('met');
+                    icon.className = 'fas fa-times';
+                }
+            });
+        }
+        
+        // Form validation
+        form.addEventListener('submit', function(e) {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Şifreler eşleşmiyor!');
+                return;
+            }
+            
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('Şifre en az 6 karakter olmalıdır!');
+                return;
+            }
+            
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Hesap oluşturuluyor...';
+            submitBtn.disabled = true;
+        });
+        
+        // Input effects
+        const inputs = document.querySelectorAll('.form-control');
+        
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentNode.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentNode.style.transform = 'scale(1)';
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.value.length > 0 && this.id !== 'password' && this.id !== 'confirm_password') {
+                    this.style.borderColor = 'var(--neon-green)';
+                    this.nextElementSibling.style.color = 'var(--neon-green)';
+                } else if (this.value.length === 0) {
+                    this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                    this.nextElementSibling.style.color = 'rgba(255, 255, 255, 0.5)';
+                }
+            });
+        });
+        
+        // Auto-focus first input
+        if (inputs.length > 0) {
+            inputs[0].focus();
+        }
+    });
+</script>
+{% endblock %}

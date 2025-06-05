@@ -1,0 +1,408 @@
+{% extends "base.html" %}
+
+{% block title %}Rust VIP Sales - Ana Sayfa{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, rgba(205, 65, 43, 0.1) 0%, rgba(139, 69, 19, 0.1) 100%);
+        border-radius: 20px;
+        padding: 60px 0;
+        margin: 30px 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(205, 65, 43, 0.03) 2px,
+            rgba(205, 65, 43, 0.03) 4px
+        );
+        animation: move 20s linear infinite;
+    }
+
+    @keyframes move {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 3.5rem;
+        font-weight: 900;
+        background: linear-gradient(45deg, var(--rust-orange), var(--neon-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 20px;
+        text-shadow: 0 0 30px rgba(205, 65, 43, 0.5);
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 30px;
+    }
+
+    .vip-package {
+        transition: all 0.3s ease;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .vip-package::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.1), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .vip-package:hover::before {
+        left: 100%;
+    }
+
+    .package-header {
+        position: relative;
+        z-index: 2;
+    }
+
+    .package-price {
+        font-family: 'Orbitron', monospace;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--neon-green);
+        text-shadow: 0 0 10px var(--neon-green);
+    }
+
+    .package-duration {
+        background: rgba(57, 255, 20, 0.2);
+        color: var(--neon-green);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-block;
+        margin: 10px 0;
+    }
+
+    .features-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .features-list li {
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        padding-left: 25px;
+    }
+
+    .features-list li::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: var(--neon-green);
+        font-weight: bold;
+    }
+
+    .features-list li:last-child {
+        border-bottom: none;
+    }
+
+    .popular-badge {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background: linear-gradient(45deg, var(--neon-green), #32CD32);
+        color: #000;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        transform: rotate(15deg);
+        box-shadow: 0 4px 15px rgba(57, 255, 20, 0.4);
+    }
+
+    .stats-section {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 40px;
+        margin: 50px 0;
+        border: 1px solid rgba(205, 65, 43, 0.3);
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .stat-number {
+        font-family: 'Orbitron', monospace;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--rust-orange);
+        text-shadow: 0 0 10px var(--rust-orange);
+    }
+
+    .stat-label {
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .info-section {
+        background: linear-gradient(135deg, rgba(0, 191, 255, 0.1) 0%, rgba(57, 255, 20, 0.1) 100%);
+        border-radius: 15px;
+        padding: 40px;
+        margin: 30px 0;
+        border: 1px solid rgba(0, 191, 255, 0.3);
+    }
+
+    .info-icon {
+        font-size: 3rem;
+        color: var(--neon-blue);
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .package-price {
+            font-size: 2rem;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title floating">RUST VIP SALES</h1>
+        <p class="hero-subtitle">Rust sunucunuzda VIP ayrıcalıklarının tadını çıkarın!</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <span class="badge bg-success fs-6 px-3 py-2">
+                <i class="fas fa-shield-alt"></i> Güvenli Ödeme
+            </span>
+            <span class="badge bg-primary fs-6 px-3 py-2">
+                <i class="fas fa-bolt"></i> Anında Aktivasyon
+            </span>
+            <span class="badge bg-warning fs-6 px-3 py-2">
+                <i class="fas fa-headset"></i> 7/24 Destek
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- VIP Packages -->
+{% if vip_packages %}
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4 glow-text" style="color: var(--rust-orange);">
+            <i class="fas fa-crown"></i> VIP PAKETLERİ
+        </h2>
+    </div>
+    {% for package in vip_packages %}
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card vip-package h-100 {% if loop.index == 2 %}neon-border{% endif %}">
+            {% if loop.index == 2 %}
+            <div class="popular-badge">
+                <i class="fas fa-star"></i> Popüler
+            </div>
+            {% endif %}
+            <div class="card-header package-header text-center">
+                <h4 class="mb-0">{{ package.name }}</h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="package-price">${{ "%.0f"|format(package.price) }}</div>
+                <div class="package-duration">
+                    <i class="fas fa-calendar-alt"></i> {{ package.duration_days }} Gün
+                </div>
+                <p class="text-muted mb-4">{{ package.description }}</p>
+                
+                {% if package.features %}
+                <ul class="features-list mb-4">
+                    {% for feature in package.features.split(',') %}
+                    <li>{{ feature.strip() }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            <div class="card-footer text-center">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('buy_vip', package_id=package.id) }}" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-shopping-cart"></i> Satın Al
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-sign-in-alt"></i> Giriş Yapın
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Stats Section -->
+<div class="stats-section">
+    <div class="row">
+        <div class="col-md-3 col-6">
+            <div class="stat-item">
+                <div class="stat-number pulse">500+</div>
+                <div class="stat-label">Mutlu Müşteri</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-item">
+                <div class="stat-number pulse">1000+</div>
+                <div class="stat-label">VIP Satışı</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-item">
+                <div class="stat-number pulse">24/7</div>
+                <div class="stat-label">Destek</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-item">
+                <div class="stat-number pulse">99%</div>
+                <div class="stat-label">Memnuniyet</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info Sections -->
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="info-section text-center h-100">
+            <div class="info-icon">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <h4>Anında Aktivasyon</h4>
+            <p>Ödemeniz onaylandıktan sonra VIP'iniz anında aktif hale gelir. Beklemeden oyunun tadını çıkarın!</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="info-section text-center h-100">
+            <div class="info-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h4>Güvenli Ödeme</h4>
+            <p>Kripto para ile güvenli ödeme seçenekleri. Bitcoin, Ethereum, Litecoin ve USDT kabul edilir.</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="info-section text-center h-100">
+            <div class="info-icon">
+                <i class="fas fa-headset"></i>
+            </div>
+            <h4>7/24 Destek</h4>
+            <p>Herhangi bir sorunuz olduğunda 7/24 destek ekibimiz size yardımcı olmaya hazır.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+{% if not current_user.is_authenticated %}
+<div class="text-center my-5">
+    <div class="card" style="background: linear-gradient(45deg, var(--rust-orange), var(--rust-light)); border: none;">
+        <div class="card-body py-4">
+            <h3 class="mb-3">Hemen Başlayın!</h3>
+            <p class="mb-4">VIP ayrıcalıklarından yararlanmak için hemen hesap oluşturun.</p>
+            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-3">
+                <i class="fas fa-user-plus"></i> Ücretsiz Kayıt Ol
+            </a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-sign-in-alt"></i> Giriş Yap
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Sayfa yüklendiğinde animasyonları başlat
+    document.addEventListener('DOMContentLoaded', function() {
+        // Kartlara hover efekti
+        const cards = document.querySelectorAll('.vip-package');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+        
+        // Sayıları animasyonla göster
+        const statNumbers = document.querySelectorAll('.stat-number');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const target = entry.target;
+                    const text = target.textContent;
+                    const number = parseInt(text.replace(/\D/g, ''));
+                    
+                    if (number) {
+                        animateNumber(target, 0, number, 2000, text.replace(/\d/g, ''));
+                    }
+                }
+            });
+        });
+        
+        statNumbers.forEach(stat => observer.observe(stat));
+    });
+    
+    function animateNumber(element, start, end, duration, suffix = '') {
+        const startTime = performance.now();
+        
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            const current = Math.floor(start + (end - start) * progress);
+            element.textContent = current + suffix;
+            
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+        }
+        
+        requestAnimationFrame(update);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,898 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Siparişler - Admin Panel{% endblock %}
+{% block page_title %}Sipariş Yönetimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filters-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .orders-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .orders-stats {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 10px 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+    }
+
+    .stat-value {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--rust-orange);
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .orders-table-container {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .bulk-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .bulk-select {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        padding: 5px 10px;
+        color: #fff;
+    }
+
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .orders-table th {
+        background: var(--rust-orange);
+        color: #fff;
+        padding: 15px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-align: left;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .orders-table td {
+        padding: 15px;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-light);
+        vertical-align: middle;
+    }
+
+    .orders-table tr:hover {
+        background: rgba(205, 65, 43, 0.05);
+    }
+
+    .order-number {
+        font-family: 'Orbitron', monospace;
+        font-weight: 700;
+        color: var(--rust-orange);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .order-number:hover {
+        color: var(--rust-light);
+        text-shadow: 0 0 5px var(--rust-orange);
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--rust-orange);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+    }
+
+    .vip-package {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .vip-icon {
+        color: var(--neon-green);
+        text-shadow: 0 0 5px var(--neon-green);
+    }
+
+    .amount {
+        font-family: 'Orbitron', monospace;
+        font-weight: 700;
+        color: var(--neon-green);
+        text-shadow: 0 0 5px var(--neon-green);
+    }
+
+    .payment-method {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        font-size: 0.9rem;
+    }
+
+    .payment-method.btc {
+        color: #f7931a;
+        border: 1px solid #f7931a;
+    }
+
+    .payment-method.eth {
+        color: #627eea;
+        border: 1px solid #627eea;
+    }
+
+    .payment-method.ltc {
+        color: #bfbbbb;
+        border: 1px solid #bfbbbb;
+    }
+
+    .payment-method.usdt {
+        color: #26a17b;
+        border: 1px solid #26a17b;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 25px;
+        padding: 20px;
+    }
+
+    .pagination-btn {
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        color: var(--text-light);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .pagination-btn:hover {
+        background: var(--rust-orange);
+        color: #fff;
+    }
+
+    .pagination-btn.active {
+        background: var(--rust-orange);
+        color: #fff;
+    }
+
+    .pagination-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .search-box {
+        position: relative;
+        max-width: 300px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 40px 10px 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 25px;
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--rust-orange);
+        box-shadow: 0 0 10px rgba(205, 65, 43, 0.3);
+    }
+
+    .search-btn {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--rust-orange);
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+        background: var(--rust-light);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .export-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .order-details-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: var(--card-bg);
+        border: 2px solid var(--rust-orange);
+        border-radius: 15px;
+        padding: 30px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--rust-orange);
+        margin: 0;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        color: var(--text-light);
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+        color: #ff4444;
+        transform: scale(1.2);
+    }
+
+    @media (max-width: 768px) {
+        .filters-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .orders-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .orders-stats {
+            justify-content: center;
+        }
+        
+        .orders-table {
+            font-size: 0.9rem;
+        }
+        
+        .orders-table th,
+        .orders-table td {
+            padding: 10px 8px;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .export-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Filters -->
+<div class="filters-card">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-filter"></i> Filtreler
+        </h3>
+    </div>
+    
+    <form method="GET" class="filters-form">
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label class="form-label">Durum</label>
+                <select name="status" class="form-control">
+                    <option value="">Tümü</option>
+                    <option value="pending" {{ 'selected' if request.args.get('status') == 'pending' }}>Beklemede</option>
+                    <option value="completed" {{ 'selected' if request.args.get('status') == 'completed' }}>Tamamlandı</option>
+                    <option value="expired" {{ 'selected' if request.args.get('status') == 'expired' }}>Süresi Doldu</option>
+                    <option value="cancelled" {{ 'selected' if request.args.get('status') == 'cancelled' }}>İptal Edildi</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="form-label">Ödeme Yöntemi</label>
+                <select name="payment_method" class="form-control">
+                    <option value="">Tümü</option>
+                    <option value="btc" {{ 'selected' if request.args.get('payment_method') == 'btc' }}>Bitcoin</option>
+                    <option value="eth" {{ 'selected' if request.args.get('payment_method') == 'eth' }}>Ethereum</option>
+                    <option value="ltc" {{ 'selected' if request.args.get('payment_method') == 'ltc' }}>Litecoin</option>
+                    <option value="usdt" {{ 'selected' if request.args.get('payment_method') == 'usdt' }}>USDT</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="form-label">Başlangıç Tarihi</label>
+                <input type="date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}">
+            </div>
+            
+            <div class="filter-group">
+                <label class="form-label">Bitiş Tarihi</label>
+                <input type="date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}">
+            </div>
+            
+            <div class="filter-group">
+                <label class="form-label">&nbsp;</label>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn-admin btn-primary">
+                        <i class="fas fa-search"></i> Filtrele
+                    </button>
+                    <a href="{{ url_for('admin_orders') }}" class="btn-admin btn-secondary">
+                        <i class="fas fa-times"></i> Temizle
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Orders Header -->
+<div class="orders-header">
+    <div class="orders-stats">
+        <div class="stat-item">
+            <div class="stat-value">{{ orders.total }}</div>
+            <div class="stat-label">Toplam</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">{{ orders_stats.pending }}</div>
+            <div class="stat-label">Beklemede</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">{{ orders_stats.completed }}</div>
+            <div class="stat-label">Tamamlandı</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">${{ "%.0f"|format(orders_stats.total_revenue) }}</div>
+            <div class="stat-label">Toplam Gelir</div>
+        </div>
+    </div>
+    
+    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+        <!-- Search Box -->
+        <div class="search-box">
+            <form method="GET">
+                {% for key, value in request.args.items() %}
+                    {% if key != 'search' %}
+                        <input type="hidden" name="{{ key }}" value="{{ value }}">
+                    {% endif %}
+                {% endfor %}
+                <input type="text" name="search" class="search-input" placeholder="Sipariş no, kullanıcı ara..." value="{{ request.args.get('search', '') }}">
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+        
+        <!-- Export Buttons -->
+        <div class="export-buttons">
+            <a href="{{ url_for('admin_orders_export', format='csv') }}{{ '?' + request.query_string.decode() if request.query_string }}" class="btn-admin btn-secondary">
+                <i class="fas fa-file-csv"></i> CSV
+            </a>
+            <a href="{{ url_for('admin_orders_export', format='excel') }}{{ '?' + request.query_string.decode() if request.query_string }}" class="btn-admin btn-secondary">
+                <i class="fas fa-file-excel"></i> Excel
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Orders Table -->
+<div class="orders-table-container">
+    <div class="table-header">
+        <div class="bulk-actions">
+            <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+            <label for="selectAll" style="margin-left: 8px; margin-right: 15px;">Tümünü Seç</label>
+            
+            <select class="bulk-select" id="bulkAction">
+                <option value="">Toplu İşlem Seç</option>
+                <option value="approve">Onayla</option>
+                <option value="cancel">İptal Et</option>
+                <option value="delete">Sil</option>
+            </select>
+            
+            <button onclick="executeBulkAction()" class="btn-admin btn-warning btn-sm">
+                <i class="fas fa-play"></i> Uygula
+            </button>
+        </div>
+        
+        <div>
+            <span class="text-muted">{{ orders.items|length }} / {{ orders.total }} sipariş gösteriliyor</span>
+        </div>
+    </div>
+    
+    <div style="overflow-x: auto;">
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th width="40">
+                        <input type="checkbox" id="selectAllTable" onchange="toggleSelectAll()">
+                    </th>
+                    <th>Sipariş No</th>
+                    <th>Kullanıcı</th>
+                    <th>VIP Paketi</th>
+                    <th>Steam ID</th>
+                    <th>Tutar</th>
+                    <th>Ödeme</th>
+                    <th>Durum</th>
+                    <th>Tarih</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders.items %}
+                <tr>
+                    <td>
+                        <input type="checkbox" class="order-checkbox" value="{{ order.id }}">
+                    </td>
+                    <td>
+                        <a href="#" onclick="showOrderDetails({{ order.id }})" class="order-number">
+                            {{ order.order_number }}
+                        </a>
+                    </td>
+                    <td>
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                {{ order.user.username[0].upper() if order.user else 'G' }}
+                            </div>
+                            <div>
+                                <div>{{ order.user.username if order.user else 'Misafir' }}</div>
+                                {% if order.user and order.user.email %}
+                                <small class="text-muted">{{ order.user.email }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="vip-package">
+                            <i class="fas fa-crown vip-icon"></i>
+                            <div>
+                                <div>{{ order.vip_package.name }}</div>
+                                <small class="text-muted">{{ order.vip_package.duration_days }} gün</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">
+                            {{ order.steam_id }}
+                        </code>
+                    </td>
+                    <td>
+                        <span class="amount">${{ "%.2f"|format(order.amount) }}</span>
+                    </td>
+                    <td>
+                        <div class="payment-method {{ order.payment_method }}">
+                            {% if order.payment_method == 'btc' %}
+                                <i class="fab fa-bitcoin"></i> BTC
+                            {% elif order.payment_method == 'eth' %}
+                                <i class="fab fa-ethereum"></i> ETH
+                            {% elif order.payment_method == 'ltc' %}
+                                <i class="fas fa-coins"></i> LTC
+                            {% elif order.payment_method == 'usdt' %}
+                                <i class="fas fa-dollar-sign"></i> USDT
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ order.status }}">
+                            {{ order.status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div>{{ order.created_at.strftime('%d.%m.%Y') }}</div>
+                        <small class="text-muted">{{ order.created_at.strftime('%H:%M') }}</small>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button onclick="showOrderDetails({{ order.id }})" class="btn-admin btn-secondary btn-sm" title="Detaylar">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            
+                            {% if order.status == 'pending' %}
+                            <button onclick="approveOrder({{ order.id }})" class="btn-admin btn-success btn-sm" title="Onayla">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button onclick="cancelOrder({{ order.id }})" class="btn-admin btn-danger btn-sm" title="İptal Et">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            {% endif %}
+                            
+                            {% if order.status == 'completed' and order.vip_active %}
+                            <button onclick="revokeVip({{ order.id }})" class="btn-admin btn-warning btn-sm" title="VIP İptal Et">
+                                <i class="fas fa-crown"></i>
+                            </button>
+                            {% endif %}
+                            
+                            <button onclick="deleteOrder({{ order.id }})" class="btn-admin btn-danger btn-sm" title="Sil">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    {% if orders.pages > 1 %}
+    <div class="pagination">
+        {% if orders.has_prev %}
+            <a href="{{ url_for('admin_orders', page=orders.prev_num, **request.args) }}" class="pagination-btn">
+                <i class="fas fa-chevron-left"></i> Önceki
+            </a>
+        {% endif %}
+        
+        {% for page_num in orders.iter_pages() %}
+            {% if page_num %}
+                {% if page_num != orders.page %}
+                    <a href="{{ url_for('admin_orders', page=page_num, **request.args) }}" class="pagination-btn">{{ page_num }}</a>
+                {% else %}
+                    <span class="pagination-btn active">{{ page_num }}</span>
+                {% endif %}
+            {% else %}
+                <span class="pagination-btn">...</span>
+            {% endif %}
+        {% endfor %}
+        
+        {% if orders.has_next %}
+            <a href="{{ url_for('admin_orders', page=orders.next_num, **request.args) }}" class="pagination-btn">
+                Sonraki <i class="fas fa-chevron-right"></i>
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Order Details Modal -->
+<div id="orderDetailsModal" class="order-details-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Sipariş Detayları</h3>
+            <button class="modal-close" onclick="closeOrderDetails()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="orderDetailsContent">
+            <!-- Order details will be loaded here -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Select all functionality
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll');
+        const selectAllTable = document.getElementById('selectAllTable');
+        const checkboxes = document.querySelectorAll('.order-checkbox');
+        
+        const isChecked = selectAll.checked || selectAllTable.checked;
+        
+        selectAll.checked = isChecked;
+        selectAllTable.checked = isChecked;
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = isChecked;
+        });
+    }
+    
+    // Execute bulk action
+    function executeBulkAction() {
+        const action = document.getElementById('bulkAction').value;
+        const selectedOrders = Array.from(document.querySelectorAll('.order-checkbox:checked')).map(cb => cb.value);
+        
+        if (!action) {
+            alert('Lütfen bir işlem seçin.');
+            return;
+        }
+        
+        if (selectedOrders.length === 0) {
+            alert('Lütfen en az bir sipariş seçin.');
+            return;
+        }
+        
+        const actionNames = {
+            'approve': 'onayla',
+            'cancel': 'iptal et',
+            'delete': 'sil'
+        };
+        
+        if (confirm(`Seçili ${selectedOrders.length} siparişi ${actionNames[action]}mak istediğinizden emin misiniz?`)) {
+            const formData = new FormData();
+            formData.append('action', action);
+            formData.append('order_ids', JSON.stringify(selectedOrders));
+            
+            fetch('/admin/orders/bulk-action', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Hata: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Bir hata oluştu: ' + error.message);
+            });
+        }
+    }
+    
+    // Show order details
+    function showOrderDetails(orderId) {
+        const modal = document.getElementById('orderDetailsModal');
+        const content = document.getElementById('orderDetailsContent');
+        
+        content.innerHTML = '<div class="text-center"><div class="loading"></div> Yükleniyor...</div>';
+        modal.style.display = 'flex';
+        
+        fetch(`/admin/orders/${orderId}/details`)
+            .then(response => response.text())
+            .then(html => {
+                content.innerHTML = html;
+            })
+            .catch(error => {
+                content.innerHTML = '<div class="alert alert-danger">Detaylar yüklenirken hata oluştu.</div>';
+            });
+    }
+    
+    // Close order details modal
+    function closeOrderDetails() {
+        document.getElementById('orderDetailsModal').style.display = 'none';
+    }
+    
+    // Approve order
+    function approveOrder(orderId) {
+        if (confirm('Bu siparişi onaylamak istediğinizden emin misiniz?')) {
+            const button = event.target.closest('button');
+            const hideLoading = showLoading(button, 'Onaylanıyor...');
+            
+            fetch(`/admin/orders/${orderId}/approve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Hata: ' + data.message);
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                alert('Bir hata oluştu: ' + error.message);
+            });
+        }
+    }
+    
+    // Cancel order
+    function cancelOrder(orderId) {
+        if (confirm('Bu siparişi iptal etmek istediğinizden emin misiniz?')) {
+            const button = event.target.closest('button');
+            const hideLoading = showLoading(button, 'İptal ediliyor...');
+            
+            fetch(`/admin/orders/${orderId}/cancel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Hata: ' + data.message);
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                alert('Bir hata oluştu: ' + error.message);
+            });
+        }
+    }
+    
+    // Revoke VIP
+    function revokeVip(orderId) {
+        if (confirm('Bu kullanıcının VIP\'ini iptal etmek istediğinizden emin misiniz?')) {
+            const button = event.target.closest('button');
+            const hideLoading = showLoading(button, 'İptal ediliyor...');
+            
+            fetch(`/admin/orders/${orderId}/revoke-vip`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Hata: ' + data.message);
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                alert('Bir hata oluştu: ' + error.message);
+            });
+        }
+    }
+    
+    // Delete order
+    function deleteOrder(orderId) {
+        if (confirm('Bu siparişi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
+            const button = event.target.closest('button');
+            const hideLoading = showLoading(button, 'Siliniyor...');
+            
+            fetch(`/admin/orders/${orderId}/delete`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Hata: ' + data.message);
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                alert('Bir hata oluştu: ' + error.message);
+            });
+        }
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('orderDetailsModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeOrderDetails();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeOrderDetails();
+        }
+    });
+    
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+        if (document.visibilityState === 'visible') {
+            location.reload();
+        }
+    }, 30000);
+</script>
+{% endblock %}

@@ -1,0 +1,584 @@
+{% extends "base.html" %}
+
+{% block title %}Sipariş #{{ order.order_number }} - Rust VIP Sales{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-container {
+        padding: 40px 0;
+    }
+
+    .order-header {
+        background: var(--card-bg);
+        border: 2px solid var(--neon-green);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .order-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--neon-green), var(--neon-blue), var(--rust-orange), var(--neon-green));
+        background-size: 200% 100%;
+        animation: gradient-shift 3s ease infinite;
+    }
+
+    @keyframes gradient-shift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .order-status {
+        display: inline-block;
+        background: rgba(57, 255, 20, 0.2);
+        color: var(--neon-green);
+        padding: 10px 25px;
+        border-radius: 25px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 2px solid var(--neon-green);
+        margin-bottom: 20px;
+        animation: pulse 2s infinite;
+    }
+
+    .order-number {
+        font-family: 'Orbitron', monospace;
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--rust-orange);
+        text-shadow: 0 0 15px rgba(205, 65, 43, 0.5);
+        margin-bottom: 15px;
+    }
+
+    .order-message {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 0;
+    }
+
+    .order-details {
+        background: var(--card-bg);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--rust-orange);
+        margin-bottom: 25px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 2px solid var(--rust-orange);
+        padding-bottom: 10px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .detail-value.highlight {
+        color: var(--neon-green);
+        text-shadow: 0 0 5px var(--neon-green);
+    }
+
+    .payment-section {
+        background: linear-gradient(135deg, rgba(205, 65, 43, 0.1) 0%, rgba(139, 69, 19, 0.1) 100%);
+        border: 2px solid var(--rust-orange);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    .payment-method-display {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .payment-icon {
+        font-size: 2rem;
+        margin-right: 15px;
+        color: var(--rust-orange);
+    }
+
+    .payment-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .payment-address {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        padding: 15px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        word-break: break-all;
+        position: relative;
+        margin-bottom: 15px;
+    }
+
+    .copy-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: var(--rust-orange);
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .copy-btn:hover {
+        background: var(--rust-light);
+        transform: scale(1.05);
+    }
+
+    .payment-instructions {
+        background: rgba(0, 191, 255, 0.1);
+        border: 1px solid var(--neon-blue);
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .instruction-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+    }
+
+    .instruction-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .instruction-number {
+        background: var(--neon-blue);
+        color: #000;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+
+    .instruction-text {
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.5;
+    }
+
+    .warning-box {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid #ffc107;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .warning-box i {
+        color: #ffc107;
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 30px;
+    }
+
+    .btn-action {
+        padding: 15px 30px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-radius: 10px;
+        border: none;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, var(--rust-orange), var(--rust-light));
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(205, 65, 43, 0.4);
+        color: #fff;
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        color: #fff;
+    }
+
+    .countdown-timer {
+        background: rgba(255, 68, 68, 0.1);
+        border: 1px solid #ff4444;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .countdown-time {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ff4444;
+        text-shadow: 0 0 10px #ff4444;
+    }
+
+    @media (max-width: 768px) {
+        .order-header {
+            padding: 25px;
+        }
+        
+        .order-number {
+            font-size: 1.5rem;
+        }
+        
+        .detail-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+        
+        .payment-method-display {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .payment-icon {
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="order-container">
+    <!-- Order Header -->
+    <div class="order-header">
+        <div class="order-status">
+            <i class="fas fa-clock"></i> Ödeme Bekleniyor
+        </div>
+        <h1 class="order-number">{{ order.order_number }}</h1>
+        <p class="order-message">
+            Siparişiniz başarıyla oluşturuldu! Ödemenizi tamamladıktan sonra VIP'iniz otomatik olarak aktif hale gelecektir.
+        </p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <!-- Order Details -->
+            <div class="order-details">
+                <h3 class="section-title">
+                    <i class="fas fa-receipt"></i> Sipariş Detayları
+                </h3>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Sipariş Numarası:</span>
+                    <span class="detail-value highlight">{{ order.order_number }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">VIP Paketi:</span>
+                    <span class="detail-value">{{ order.vip_package.name }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Steam ID:</span>
+                    <span class="detail-value">{{ order.steam_id }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Süre:</span>
+                    <span class="detail-value">{{ order.vip_package.duration_days }} Gün</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Tutar:</span>
+                    <span class="detail-value highlight">${{ "%.2f"|format(order.amount) }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Sipariş Tarihi:</span>
+                    <span class="detail-value">{{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Bitiş Tarihi:</span>
+                    <span class="detail-value">{{ order.expires_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <!-- Payment Section -->
+            <div class="payment-section">
+                <h3 class="section-title">
+                    <i class="fas fa-credit-card"></i> Ödeme Bilgileri
+                </h3>
+                
+                <!-- Payment Method Display -->
+                <div class="payment-method-display">
+                    {% if order.payment_method == 'btc' %}
+                        <i class="fab fa-bitcoin payment-icon"></i>
+                        <span class="payment-name">Bitcoin (BTC)</span>
+                    {% elif order.payment_method == 'eth' %}
+                        <i class="fab fa-ethereum payment-icon"></i>
+                        <span class="payment-name">Ethereum (ETH)</span>
+                    {% elif order.payment_method == 'ltc' %}
+                        <i class="fas fa-coins payment-icon"></i>
+                        <span class="payment-name">Litecoin (LTC)</span>
+                    {% elif order.payment_method == 'usdt' %}
+                        <i class="fas fa-dollar-sign payment-icon"></i>
+                        <span class="payment-name">Tether (USDT)</span>
+                    {% endif %}
+                </div>
+                
+                <!-- Payment Address -->
+                <div class="payment-address" id="paymentAddress">
+                    {{ payment_addresses[order.payment_method] }}
+                    <button class="copy-btn" onclick="copyAddress()">
+                        <i class="fas fa-copy"></i> Kopyala
+                    </button>
+                </div>
+                
+                <!-- Payment Instructions -->
+                <div class="payment-instructions">
+                    <h4 style="color: var(--neon-blue); margin-bottom: 15px;">
+                        <i class="fas fa-info-circle"></i> Ödeme Talimatları
+                    </h4>
+                    
+                    <div class="instruction-item">
+                        <div class="instruction-number">1</div>
+                        <div class="instruction-text">
+                            Yukarıdaki adresi kopyalayın ve cüzdanınızdan tam olarak <strong>${{ "%.2f"|format(order.amount) }}</strong> değerinde {{ order.payment_method.upper() }} gönderin.
+                        </div>
+                    </div>
+                    
+                    <div class="instruction-item">
+                        <div class="instruction-number">2</div>
+                        <div class="instruction-text">
+                            İşlem onaylandıktan sonra (genellikle 10-30 dakika) VIP'iniz otomatik olarak aktif hale gelecektir.
+                        </div>
+                    </div>
+                    
+                    <div class="instruction-item">
+                        <div class="instruction-number">3</div>
+                        <div class="instruction-text">
+                            Herhangi bir sorun yaşarsanız destek ekibimizle iletişime geçin ve sipariş numaranızı belirtin.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Warning -->
+                <div class="warning-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Önemli:</strong> Lütfen tam tutarı gönderin. Eksik veya fazla gönderilen ödemeler işleme alınamayabilir.
+                </div>
+                
+                <!-- Countdown Timer -->
+                <div class="countdown-timer">
+                    <div style="margin-bottom: 10px;">
+                        <i class="fas fa-hourglass-half"></i> Ödeme için kalan süre:
+                    </div>
+                    <div class="countdown-time" id="countdown">
+                        23:59:59
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="{{ url_for('my_orders') }}" class="btn-action btn-primary">
+            <i class="fas fa-list"></i> Siparişlerim
+        </a>
+        <a href="{{ url_for('index') }}" class="btn-action btn-secondary">
+            <i class="fas fa-home"></i> Ana Sayfa
+        </a>
+        <a href="#" class="btn-action btn-secondary" onclick="refreshStatus()">
+            <i class="fas fa-sync-alt"></i> Durumu Yenile
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Copy address function
+    function copyAddress() {
+        const addressElement = document.getElementById('paymentAddress');
+        const address = addressElement.textContent.trim().replace('Kopyala', '').trim();
+        
+        navigator.clipboard.writeText(address).then(function() {
+            const copyBtn = addressElement.querySelector('.copy-btn');
+            const originalText = copyBtn.innerHTML;
+            
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Kopyalandı!';
+            copyBtn.style.background = 'var(--neon-green)';
+            
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+                copyBtn.style.background = 'var(--rust-orange)';
+            }, 2000);
+        }).catch(function() {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = address;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Adres kopyalandı: ' + address);
+        });
+    }
+    
+    // Countdown timer
+    function startCountdown() {
+        const countdownElement = document.getElementById('countdown');
+        let timeLeft = 24 * 60 * 60; // 24 hours in seconds
+        
+        function updateCountdown() {
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = timeLeft % 60;
+            
+            countdownElement.textContent = 
+                String(hours).padStart(2, '0') + ':' +
+                String(minutes).padStart(2, '0') + ':' +
+                String(seconds).padStart(2, '0');
+            
+            if (timeLeft <= 0) {
+                countdownElement.textContent = '00:00:00';
+                countdownElement.style.color = '#ff4444';
+                return;
+            }
+            
+            timeLeft--;
+            setTimeout(updateCountdown, 1000);
+        }
+        
+        updateCountdown();
+    }
+    
+    // Refresh status function
+    function refreshStatus() {
+        const refreshBtn = document.querySelector('[onclick="refreshStatus()"]');
+        const originalText = refreshBtn.innerHTML;
+        
+        refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yenileniyor...';
+        refreshBtn.style.pointerEvents = 'none';
+        
+        // Simulate refresh (in real implementation, this would check payment status)
+        setTimeout(() => {
+            refreshBtn.innerHTML = originalText;
+            refreshBtn.style.pointerEvents = 'auto';
+            
+            // You could add actual status checking here
+            // For now, just show a message
+            alert('Durum kontrol edildi. Ödeme henüz alınmadı.');
+        }, 2000);
+    }
+    
+    // Auto-refresh page every 5 minutes to check payment status
+    setInterval(() => {
+        // In a real implementation, you would make an AJAX call to check status
+        // For now, we'll just reload the page
+        if (document.visibilityState === 'visible') {
+            location.reload();
+        }
+    }, 5 * 60 * 1000); // 5 minutes
+    
+    // Start countdown when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        startCountdown();
+        
+        // Add floating animation to order header
+        const orderHeader = document.querySelector('.order-header');
+        let floatDirection = 1;
+        
+        setInterval(() => {
+            const currentTransform = orderHeader.style.transform || 'translateY(0px)';
+            const currentY = parseFloat(currentTransform.match(/translateY\(([^)]+)px\)/) ? currentTransform.match(/translateY\(([^)]+)px\)/)[1] : 0);
+            
+            if (currentY >= 3) floatDirection = -1;
+            if (currentY <= -3) floatDirection = 1;
+            
+            orderHeader.style.transform = `translateY(${currentY + (floatDirection * 0.3)}px)`;
+        }, 100);
+    });
+</script>
+{% endblock %}

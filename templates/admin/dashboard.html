@@ -1,0 +1,660 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard - Admin Panel{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--rust-orange), var(--neon-green));
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(205, 65, 43, 0.2);
+        border-color: var(--rust-orange);
+    }
+
+    .stat-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        color: var(--rust-orange);
+        text-shadow: 0 0 15px rgba(205, 65, 43, 0.5);
+    }
+
+    .stat-value {
+        font-family: 'Orbitron', monospace;
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: var(--neon-green);
+        text-shadow: 0 0 10px var(--neon-green);
+        margin-bottom: 10px;
+    }
+
+    .stat-label {
+        color: var(--text-light);
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .stat-change {
+        font-size: 0.9rem;
+        margin-top: 8px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        display: inline-block;
+    }
+
+    .stat-change.positive {
+        background: rgba(57, 255, 20, 0.2);
+        color: var(--neon-green);
+    }
+
+    .stat-change.negative {
+        background: rgba(255, 68, 68, 0.2);
+        color: #ff4444;
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .chart-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        padding: 25px;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .chart-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--rust-orange);
+        margin: 0;
+    }
+
+    .chart-period {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        padding: 5px 10px;
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+
+    .chart-container {
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px dashed var(--border-color);
+    }
+
+    .chart-placeholder {
+        text-align: center;
+        color: var(--text-muted);
+    }
+
+    .recent-activity {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        padding: 25px;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 1.2rem;
+    }
+
+    .activity-icon.order {
+        background: rgba(57, 255, 20, 0.2);
+        color: var(--neon-green);
+    }
+
+    .activity-icon.payment {
+        background: rgba(0, 191, 255, 0.2);
+        color: var(--neon-blue);
+    }
+
+    .activity-icon.user {
+        background: rgba(205, 65, 43, 0.2);
+        color: var(--rust-orange);
+    }
+
+    .activity-icon.system {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-title {
+        color: #fff;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .activity-description {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .activity-time {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        text-align: right;
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .quick-action {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        text-decoration: none;
+        color: var(--text-light);
+        transition: all 0.3s ease;
+    }
+
+    .quick-action:hover {
+        border-color: var(--rust-orange);
+        transform: translateY(-3px);
+        color: #fff;
+        box-shadow: 0 5px 20px rgba(205, 65, 43, 0.2);
+    }
+
+    .quick-action-icon {
+        font-size: 2rem;
+        color: var(--rust-orange);
+        margin-bottom: 10px;
+    }
+
+    .quick-action-title {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .quick-action-desc {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .server-status {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .status-item {
+        text-align: center;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+    }
+
+    .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+        animation: pulse 2s infinite;
+    }
+
+    .status-indicator.online {
+        background: var(--neon-green);
+        box-shadow: 0 0 10px var(--neon-green);
+    }
+
+    .status-indicator.offline {
+        background: #ff4444;
+        box-shadow: 0 0 10px #ff4444;
+    }
+
+    .status-indicator.warning {
+        background: #ffc107;
+        box-shadow: 0 0 10px #ffc107;
+    }
+
+    @media (max-width: 768px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Server Status -->
+<div class="server-status">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-server"></i> Sunucu Durumu
+        </h3>
+    </div>
+    
+    <div class="status-grid">
+        <div class="status-item">
+            <div>
+                <span class="status-indicator {{ 'online' if server_status.rcon else 'offline' }}"></span>
+                RCON Bağlantısı
+            </div>
+            <div class="mt-2">
+                <small class="text-muted">{{ server_status.rcon_host }}:{{ server_status.rcon_port }}</small>
+            </div>
+        </div>
+        
+        <div class="status-item">
+            <div>
+                <span class="status-indicator {{ 'online' if server_status.database else 'offline' }}"></span>
+                Veritabanı
+            </div>
+            <div class="mt-2">
+                <small class="text-muted">{{ server_status.db_status }}</small>
+            </div>
+        </div>
+        
+        <div class="status-item">
+            <div>
+                <span class="status-indicator online"></span>
+                Web Sunucusu
+            </div>
+            <div class="mt-2">
+                <small class="text-muted">Çalışıyor</small>
+            </div>
+        </div>
+        
+        <div class="status-item">
+            <div>
+                <span class="status-indicator {{ 'online' if server_status.payment_system else 'warning' }}"></span>
+                Ödeme Sistemi
+            </div>
+            <div class="mt-2">
+                <small class="text-muted">{{ 'Aktif' if server_status.payment_system else 'Kontrol Et' }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="stat-value">{{ stats.total_orders }}</div>
+        <div class="stat-label">Toplam Sipariş</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> +{{ stats.orders_today }} bugün
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-value">${{ "%.0f"|format(stats.total_revenue) }}</div>
+        <div class="stat-label">Toplam Gelir</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> +${{ "%.0f"|format(stats.revenue_today) }} bugün
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-crown"></i>
+        </div>
+        <div class="stat-value">{{ stats.active_vips }}</div>
+        <div class="stat-label">Aktif VIP'ler</div>
+        <div class="stat-change {{ 'positive' if stats.vip_change >= 0 else 'negative' }}">
+            <i class="fas fa-arrow-{{ 'up' if stats.vip_change >= 0 else 'down' }}"></i> 
+            {{ '+' if stats.vip_change >= 0 else '' }}{{ stats.vip_change }} bu hafta
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-value">{{ stats.total_users }}</div>
+        <div class="stat-label">Toplam Kullanıcı</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> +{{ stats.new_users_today }} bugün
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="quick-actions">
+    <a href="{{ url_for('admin_orders') }}" class="quick-action">
+        <div class="quick-action-icon">
+            <i class="fas fa-plus-circle"></i>
+        </div>
+        <div class="quick-action-title">Yeni Sipariş</div>
+        <div class="quick-action-desc">Manuel sipariş oluştur</div>
+    </a>
+    
+    <a href="{{ url_for('admin_vip_packages') }}" class="quick-action">
+        <div class="quick-action-icon">
+            <i class="fas fa-crown"></i>
+        </div>
+        <div class="quick-action-title">VIP Paketi Ekle</div>
+        <div class="quick-action-desc">Yeni VIP paketi oluştur</div>
+    </a>
+    
+    <a href="{{ url_for('admin_rcon') }}" class="quick-action">
+        <div class="quick-action-icon">
+            <i class="fas fa-terminal"></i>
+        </div>
+        <div class="quick-action-title">RCON Komut</div>
+        <div class="quick-action-desc">Sunucuya komut gönder</div>
+    </a>
+    
+    <a href="{{ url_for('admin_settings') }}" class="quick-action">
+        <div class="quick-action-icon">
+            <i class="fas fa-cog"></i>
+        </div>
+        <div class="quick-action-title">Ayarlar</div>
+        <div class="quick-action-desc">Sistem ayarlarını düzenle</div>
+    </a>
+</div>
+
+<!-- Charts and Recent Activity -->
+<div class="charts-grid">
+    <!-- Sales Chart -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">
+                <i class="fas fa-chart-line"></i> Satış Grafiği
+            </h3>
+            <select class="chart-period">
+                <option value="7">Son 7 Gün</option>
+                <option value="30">Son 30 Gün</option>
+                <option value="90">Son 3 Ay</option>
+            </select>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-placeholder">
+                <i class="fas fa-chart-line" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 15px;"></i>
+                <div>Grafik yükleniyor...</div>
+                <small>Chart.js entegrasyonu yapılacak</small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="recent-activity">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-clock"></i> Son Aktiviteler
+            </h3>
+        </div>
+        
+        <div class="activity-list">
+            {% for activity in recent_activities %}
+            <div class="activity-item">
+                <div class="activity-icon {{ activity.type }}">
+                    <i class="fas fa-{{ activity.icon }}"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">{{ activity.title }}</div>
+                    <div class="activity-description">{{ activity.description }}</div>
+                </div>
+                <div class="activity-time">{{ activity.time_ago }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-3">
+            <a href="{{ url_for('admin_logs') }}" class="btn-admin btn-secondary">
+                <i class="fas fa-list"></i> Tüm Logları Görüntüle
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Orders Table -->
+<div class="admin-card">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-shopping-cart"></i> Son Siparişler
+        </h3>
+        <a href="{{ url_for('admin_orders') }}" class="btn-admin btn-primary">
+            <i class="fas fa-eye"></i> Tümünü Görüntüle
+        </a>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Sipariş No</th>
+                    <th>Kullanıcı</th>
+                    <th>VIP Paketi</th>
+                    <th>Tutar</th>
+                    <th>Durum</th>
+                    <th>Tarih</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                <tr>
+                    <td>
+                        <span style="font-family: 'Orbitron', monospace; color: var(--rust-orange);">
+                            {{ order.order_number }}
+                        </span>
+                    </td>
+                    <td>{{ order.user.username if order.user else 'Misafir' }}</td>
+                    <td>{{ order.vip_package.name }}</td>
+                    <td>${{ "%.2f"|format(order.amount) }}</td>
+                    <td>
+                        <span class="status-badge status-{{ order.status }}">
+                            {{ order.status_display }}
+                        </span>
+                    </td>
+                    <td>{{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                    <td>
+                        <a href="{{ url_for('admin_order_detail', order_id=order.id) }}" class="btn-admin btn-secondary btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        {% if order.status == 'pending' %}
+                        <button onclick="approveOrder({{ order.id }})" class="btn-admin btn-success btn-sm">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh dashboard every 30 seconds
+    let autoRefreshInterval;
+    
+    function startAutoRefresh() {
+        autoRefreshInterval = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                refreshDashboard();
+            }
+        }, 30000); // 30 seconds
+    }
+    
+    function stopAutoRefresh() {
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+        }
+    }
+    
+    function refreshDashboard() {
+        // In a real implementation, this would use AJAX to update specific sections
+        // For now, we'll just reload the page
+        location.reload();
+    }
+    
+    // Approve order function
+    function approveOrder(orderId) {
+        if (confirm('Bu siparişi onaylamak istediğinizden emin misiniz?')) {
+            const button = event.target.closest('button');
+            const hideLoading = showLoading(button, 'Onaylanıyor...');
+            
+            fetch(`/admin/orders/${orderId}/approve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Hata: ' + data.message);
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                alert('Bir hata oluştu: ' + error.message);
+            });
+        }
+    }
+    
+    // Chart period change handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const chartPeriodSelect = document.querySelector('.chart-period');
+        if (chartPeriodSelect) {
+            chartPeriodSelect.addEventListener('change', function() {
+                // In a real implementation, this would update the chart
+                console.log('Chart period changed to:', this.value);
+            });
+        }
+        
+        // Start auto-refresh
+        startAutoRefresh();
+        
+        // Stop auto-refresh when page is hidden
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                stopAutoRefresh();
+            } else {
+                startAutoRefresh();
+            }
+        });
+        
+        // Animate stat cards on load
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+        stopAutoRefresh();
+    });
+</script>
+{% endblock %}

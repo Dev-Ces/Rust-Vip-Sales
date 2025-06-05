@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+
+{% block title %}Giriş Yap - Rust VIP Sales{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 0;
+    }
+
+    .auth-card {
+        max-width: 450px;
+        width: 100%;
+        background: var(--card-bg);
+        border: 1px solid rgba(205, 65, 43, 0.3);
+        border-radius: 20px;
+        backdrop-filter: blur(15px);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--rust-orange), var(--neon-green), var(--neon-blue), var(--rust-orange));
+        background-size: 200% 100%;
+        animation: gradient-shift 3s ease infinite;
+    }
+
+    @keyframes gradient-shift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .auth-header {
+        text-align: center;
+        padding: 40px 40px 20px;
+        background: linear-gradient(135deg, rgba(205, 65, 43, 0.1) 0%, rgba(139, 69, 19, 0.1) 100%);
+    }
+
+    .auth-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--rust-orange);
+        text-shadow: 0 0 10px rgba(205, 65, 43, 0.5);
+        margin-bottom: 10px;
+    }
+
+    .auth-subtitle {
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 0;
+    }
+
+    .auth-body {
+        padding: 30px 40px 40px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+    .form-label {
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: #fff;
+        padding: 12px 45px 12px 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--rust-orange);
+        box-shadow: 0 0 20px rgba(205, 65, 43, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .input-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 1.1rem;
+        pointer-events: none;
+        transition: color 0.3s ease;
+    }
+
+    .form-control:focus + .input-icon {
+        color: var(--rust-orange);
+    }
+
+    .btn-auth {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(45deg, var(--rust-orange), var(--rust-light));
+        color: #fff;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-auth::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-auth:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(205, 65, 43, 0.4);
+        background: linear-gradient(45deg, var(--rust-light), var(--rust-orange));
+    }
+
+    .btn-auth:hover::before {
+        left: 100%;
+    }
+
+    .auth-divider {
+        text-align: center;
+        margin: 30px 0;
+        position: relative;
+    }
+
+    .auth-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    }
+
+    .auth-divider span {
+        background: var(--card-bg);
+        padding: 0 20px;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.9rem;
+    }
+
+    .auth-link {
+        color: var(--neon-green);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .auth-link:hover {
+        color: #fff;
+        text-shadow: 0 0 10px var(--neon-green);
+    }
+
+    .floating-particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--rust-orange);
+        border-radius: 50%;
+        opacity: 0.6;
+        animation: float 6s infinite linear;
+    }
+
+    @keyframes float {
+        0% {
+            transform: translateY(100vh) rotate(0deg);
+            opacity: 0;
+        }
+        10% {
+            opacity: 0.6;
+        }
+        90% {
+            opacity: 0.6;
+        }
+        100% {
+            transform: translateY(-100px) rotate(360deg);
+            opacity: 0;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .auth-card {
+            margin: 20px;
+            border-radius: 15px;
+        }
+        
+        .auth-header,
+        .auth-body {
+            padding: 30px 25px;
+        }
+        
+        .auth-title {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="floating-particles">
+        <!-- Particles will be added by JavaScript -->
+    </div>
+    
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="auth-title">
+                <i class="fas fa-sign-in-alt"></i> GİRİŞ YAP
+            </h1>
+            <p class="auth-subtitle">Hesabınıza giriş yapın</p>
+        </div>
+        
+        <div class="auth-body">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        <i class="fas fa-user"></i> Kullanıcı Adı
+                    </label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="username" 
+                           name="username" 
+                           placeholder="Kullanıcı adınızı girin"
+                           required>
+                    <i class="fas fa-user input-icon"></i>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock"></i> Şifre
+                    </label>
+                    <input type="password" 
+                           class="form-control" 
+                           id="password" 
+                           name="password" 
+                           placeholder="Şifrenizi girin"
+                           required>
+                    <i class="fas fa-lock input-icon"></i>
+                </div>
+                
+                <button type="submit" class="btn btn-auth">
+                    <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                </button>
+            </form>
+            
+            <div class="auth-divider">
+                <span>veya</span>
+            </div>
+            
+            <div class="text-center">
+                <p class="mb-0">
+                    Hesabınız yok mu? 
+                    <a href="{{ url_for('register') }}" class="auth-link">
+                        <i class="fas fa-user-plus"></i> Kayıt Ol
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Floating particles effect
+        const particlesContainer = document.querySelector('.floating-particles');
+        
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            // Random position and animation delay
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 6 + 's';
+            particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            
+            // Random color
+            const colors = ['var(--rust-orange)', 'var(--neon-green)', 'var(--neon-blue)'];
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            
+            particlesContainer.appendChild(particle);
+            
+            // Remove particle after animation
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }, 8000);
+        }
+        
+        // Create particles periodically
+        setInterval(createParticle, 500);
+        
+        // Form validation and effects
+        const form = document.querySelector('form');
+        const inputs = document.querySelectorAll('.form-control');
+        
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentNode.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentNode.style.transform = 'scale(1)';
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.value.length > 0) {
+                    this.style.borderColor = 'var(--neon-green)';
+                    this.nextElementSibling.style.color = 'var(--neon-green)';
+                } else {
+                    this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                    this.nextElementSibling.style.color = 'rgba(255, 255, 255, 0.5)';
+                }
+            });
+        });
+        
+        form.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('.btn-auth');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Giriş yapılıyor...';
+            submitBtn.disabled = true;
+        });
+        
+        // Auto-focus first input
+        if (inputs.length > 0) {
+            inputs[0].focus();
+        }
+    });
+</script>
+{% endblock %}

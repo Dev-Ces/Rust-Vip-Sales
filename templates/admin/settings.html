@@ -1,0 +1,1056 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Ayarlar - Admin Panel{% endblock %}
+{% block page_title %}Sistem Ayarları{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 25px;
+    }
+
+    .settings-section {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        padding: 25px;
+        transition: all 0.3s ease;
+    }
+
+    .settings-section:hover {
+        border-color: var(--rust-orange);
+        box-shadow: 0 5px 20px rgba(205, 65, 43, 0.1);
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--rust-orange);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 1.2rem;
+        color: #fff;
+    }
+
+    .section-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--rust-orange);
+        margin: 0;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .form-row.full {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text-light);
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: #fff;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--rust-orange);
+        box-shadow: 0 0 10px rgba(205, 65, 43, 0.3);
+    }
+
+    .form-control::placeholder {
+        color: var(--text-muted);
+    }
+
+    .form-control[readonly] {
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text-muted);
+    }
+
+    .input-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .input-group .form-control {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .input-group-append {
+        background: var(--rust-orange);
+        border: 1px solid var(--rust-orange);
+        border-left: none;
+        border-radius: 0 8px 8px 0;
+        padding: 12px 15px;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .input-group-append:hover {
+        background: var(--rust-light);
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #333;
+        transition: 0.3s;
+        border-radius: 30px;
+        border: 1px solid var(--border-color);
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        bottom: 3px;
+        background-color: #fff;
+        transition: 0.3s;
+        border-radius: 50%;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+        background-color: var(--rust-orange);
+        border-color: var(--rust-orange);
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(30px);
+    }
+
+    .toggle-group {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .toggle-group:last-child {
+        border-bottom: none;
+    }
+
+    .toggle-info {
+        flex: 1;
+        margin-right: 15px;
+    }
+
+    .toggle-title {
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 5px;
+    }
+
+    .toggle-description {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.4;
+    }
+
+    .crypto-address {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .crypto-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        color: #fff;
+    }
+
+    .crypto-icon.btc {
+        background: #f7931a;
+    }
+
+    .crypto-icon.eth {
+        background: #627eea;
+    }
+
+    .crypto-icon.ltc {
+        background: #bfbbbb;
+    }
+
+    .crypto-icon.usdt {
+        background: #26a17b;
+    }
+
+    .test-button {
+        background: var(--neon-green);
+        color: #000;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .test-button:hover {
+        background: #32cd32;
+        transform: translateY(-1px);
+    }
+
+    .test-button:disabled {
+        background: #666;
+        color: #999;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-indicator.online {
+        background: rgba(57, 255, 20, 0.2);
+        color: var(--neon-green);
+        border: 1px solid var(--neon-green);
+    }
+
+    .status-indicator.offline {
+        background: rgba(255, 68, 68, 0.2);
+        color: #ff4444;
+        border: 1px solid #ff4444;
+    }
+
+    .status-indicator.testing {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+        border: 1px solid #ffc107;
+    }
+
+    .save-section {
+        background: var(--card-bg);
+        border: 2px solid var(--rust-orange);
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        margin-top: 25px;
+    }
+
+    .save-button {
+        background: linear-gradient(45deg, var(--rust-orange), var(--rust-light));
+        color: #fff;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 0 10px;
+    }
+
+    .save-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(205, 65, 43, 0.4);
+    }
+
+    .save-button:disabled {
+        background: #666;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .reset-button {
+        background: rgba(255, 68, 68, 0.2);
+        color: #ff4444;
+        border: 1px solid #ff4444;
+        padding: 15px 40px;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 0 10px;
+    }
+
+    .reset-button:hover {
+        background: #ff4444;
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    .backup-section {
+        background: linear-gradient(135deg, rgba(0, 191, 255, 0.1) 0%, rgba(57, 255, 20, 0.1) 100%);
+        border: 1px solid var(--neon-blue);
+        border-radius: 15px;
+        padding: 25px;
+        margin-top: 25px;
+    }
+
+    .backup-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .backup-button {
+        background: var(--neon-blue);
+        color: #000;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .backup-button:hover {
+        background: #0099cc;
+        transform: translateY(-1px);
+    }
+
+    .logs-section {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        padding: 25px;
+        margin-top: 25px;
+    }
+
+    .log-entry {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+    }
+
+    .log-entry:last-child {
+        border-bottom: none;
+    }
+
+    .log-time {
+        color: var(--text-muted);
+        margin-right: 15px;
+        min-width: 80px;
+    }
+
+    .log-level {
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-right: 15px;
+        min-width: 60px;
+        text-align: center;
+    }
+
+    .log-level.info {
+        background: rgba(0, 191, 255, 0.2);
+        color: var(--neon-blue);
+    }
+
+    .log-level.success {
+        background: rgba(57, 255, 20, 0.2);
+        color: var(--neon-green);
+    }
+
+    .log-level.warning {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+    }
+
+    .log-level.error {
+        background: rgba(255, 68, 68, 0.2);
+        color: #ff4444;
+    }
+
+    .log-message {
+        flex: 1;
+        color: var(--text-light);
+    }
+
+    @media (max-width: 768px) {
+        .settings-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .crypto-address {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .backup-buttons {
+            flex-direction: column;
+        }
+        
+        .save-section {
+            padding: 20px 15px;
+        }
+        
+        .save-button,
+        .reset-button {
+            width: 100%;
+            margin: 5px 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<form id="settingsForm" method="POST">
+    <div class="settings-grid">
+        <!-- Site Settings -->
+        <div class="settings-section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h3 class="section-title">Site Ayarları</h3>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Site Başlığı</label>
+                <input type="text" name="site_title" class="form-control" value="{{ settings.site_title or 'Rust VIP Sales' }}" placeholder="Site başlığını girin">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Site Açıklaması</label>
+                <textarea name="site_description" class="form-control" rows="3" placeholder="Site açıklamasını girin">{{ settings.site_description or '' }}</textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">İletişim E-postası</label>
+                    <input type="email" name="contact_email" class="form-control" value="{{ settings.contact_email or '' }}" placeholder="admin@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Destek Discord</label>
+                    <input type="text" name="discord_url" class="form-control" value="{{ settings.discord_url or '' }}" placeholder="Discord davet linki">
+                </div>
+            </div>
+            
+            <div class="toggle-group">
+                <div class="toggle-info">
+                    <div class="toggle-title">Bakım Modu</div>
+                    <div class="toggle-description">Site bakım modunda olduğunda sadece adminler erişebilir</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" name="maintenance_mode" {{ 'checked' if settings.maintenance_mode else '' }}>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            
+            <div class="toggle-group">
+                <div class="toggle-info">
+                    <div class="toggle-title">Kayıt Açık</div>
+                    <div class="toggle-description">Yeni kullanıcı kayıtlarına izin ver</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" name="registration_enabled" {{ 'checked' if settings.registration_enabled else '' }}>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- RCON Settings -->
+        <div class="settings-section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-terminal"></i>
+                </div>
+                <h3 class="section-title">RCON Ayarları</h3>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">RCON Host</label>
+                    <input type="text" name="rcon_host" class="form-control" value="{{ settings.rcon_host or 'localhost' }}" placeholder="localhost">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">RCON Port</label>
+                    <input type="number" name="rcon_port" class="form-control" value="{{ settings.rcon_port or '28016' }}" placeholder="28016">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">RCON Şifresi</label>
+                <div class="input-group">
+                    <input type="password" name="rcon_password" class="form-control" value="{{ settings.rcon_password or '' }}" placeholder="RCON şifresini girin" id="rconPassword">
+                    <div class="input-group-append" onclick="togglePassword('rconPassword')">
+                        <i class="fas fa-eye" id="rconPasswordIcon"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Bağlantı Durumu</label>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span class="status-indicator {{ 'online' if rcon_status.connected else 'offline' }}" id="rconStatus">
+                        <i class="fas fa-{{ 'check-circle' if rcon_status.connected else 'times-circle' }}"></i>
+                        {{ 'Bağlı' if rcon_status.connected else 'Bağlantısız' }}
+                    </span>
+                    <button type="button" class="test-button" onclick="testRconConnection()" id="testRconBtn">
+                        <i class="fas fa-plug"></i> Bağlantıyı Test Et
+                    </button>
+                </div>
+            </div>
+            
+            <div class="toggle-group">
+                <div class="toggle-info">
+                    <div class="toggle-title">Otomatik VIP Yönetimi</div>
+                    <div class="toggle-description">Sipariş onaylandığında otomatik olarak VIP ver/kaldır</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" name="auto_vip_management" {{ 'checked' if settings.auto_vip_management else '' }}>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Payment Settings -->
+        <div class="settings-section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h3 class="section-title">Ödeme Ayarları</h3>
+            </div>
+            
+            <div class="crypto-address">
+                <div class="crypto-icon btc">
+                    <i class="fab fa-bitcoin"></i>
+                </div>
+                <div style="flex: 1;">
+                    <label class="form-label">Bitcoin (BTC) Adresi</label>
+                    <input type="text" name="btc_address" class="form-control" value="{{ settings.btc_address or '' }}" placeholder="Bitcoin cüzdan adresinizi girin">
+                </div>
+            </div>
+            
+            <div class="crypto-address">
+                <div class="crypto-icon eth">
+                    <i class="fab fa-ethereum"></i>
+                </div>
+                <div style="flex: 1;">
+                    <label class="form-label">Ethereum (ETH) Adresi</label>
+                    <input type="text" name="eth_address" class="form-control" value="{{ settings.eth_address or '' }}" placeholder="Ethereum cüzdan adresinizi girin">
+                </div>
+            </div>
+            
+            <div class="crypto-address">
+                <div class="crypto-icon ltc">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div style="flex: 1;">
+                    <label class="form-label">Litecoin (LTC) Adresi</label>
+                    <input type="text" name="ltc_address" class="form-control" value="{{ settings.ltc_address or '' }}" placeholder="Litecoin cüzdan adresinizi girin">
+                </div>
+            </div>
+            
+            <div class="crypto-address">
+                <div class="crypto-icon usdt">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div style="flex: 1;">
+                    <label class="form-label">USDT (TRC20) Adresi</label>
+                    <input type="text" name="usdt_address" class="form-control" value="{{ settings.usdt_address or '' }}" placeholder="USDT cüzdan adresinizi girin">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Ödeme Zaman Aşımı (Saat)</label>
+                    <input type="number" name="payment_timeout" class="form-control" value="{{ settings.payment_timeout or '24' }}" min="1" max="168">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Minimum Sipariş Tutarı ($)</label>
+                    <input type="number" name="min_order_amount" class="form-control" value="{{ settings.min_order_amount or '1' }}" min="0.01" step="0.01">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Security Settings -->
+        <div class="settings-section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="section-title">Güvenlik Ayarları</h3>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Admin Şifresi Değiştir</label>
+                <input type="password" name="new_admin_password" class="form-control" placeholder="Yeni admin şifresi (boş bırakılırsa değişmez)">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Şifre Tekrarı</label>
+                <input type="password" name="confirm_admin_password" class="form-control" placeholder="Yeni şifreyi tekrar girin">
+            </div>
+            
+            <div class="toggle-group">
+                <div class="toggle-info">
+                    <div class="toggle-title">İki Faktörlü Kimlik Doğrulama</div>
+                    <div class="toggle-description">Admin girişi için 2FA zorunlu kıl</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" name="two_factor_enabled" {{ 'checked' if settings.two_factor_enabled else '' }}>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            
+            <div class="toggle-group">
+                <div class="toggle-info">
+                    <div class="toggle-title">IP Kısıtlaması</div>
+                    <div class="toggle-description">Admin paneline sadece belirli IP'lerden erişim</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" name="ip_restriction_enabled" {{ 'checked' if settings.ip_restriction_enabled else '' }}>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">İzinli IP Adresleri (virgülle ayırın)</label>
+                <textarea name="allowed_ips" class="form-control" rows="3" placeholder="192.168.1.1, 10.0.0.1">{{ settings.allowed_ips or '' }}</textarea>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Save Section -->
+    <div class="save-section">
+        <h3 style="color: var(--rust-orange); margin-bottom: 20px;">
+            <i class="fas fa-save"></i> Ayarları Kaydet
+        </h3>
+        <p style="color: var(--text-muted); margin-bottom: 25px;">
+            Değişikliklerin etkili olması için ayarları kaydetmeyi unutmayın.
+        </p>
+        
+        <button type="submit" class="save-button" id="saveBtn">
+            <i class="fas fa-save"></i> Kaydet
+        </button>
+        
+        <button type="button" class="reset-button" onclick="resetForm()">
+            <i class="fas fa-undo"></i> Sıfırla
+        </button>
+    </div>
+</form>
+
+<!-- Backup Section -->
+<div class="backup-section">
+    <div class="section-header">
+        <div class="section-icon" style="background: var(--neon-blue);">
+            <i class="fas fa-database"></i>
+        </div>
+        <h3 class="section-title" style="color: var(--neon-blue);">Yedekleme & Geri Yükleme</h3>
+    </div>
+    
+    <p style="color: var(--text-light); text-align: center; margin-bottom: 20px;">
+        Sistem verilerinizi yedekleyin veya önceki bir yedekten geri yükleyin.
+    </p>
+    
+    <div class="backup-buttons">
+        <button class="backup-button" onclick="createBackup()">
+            <i class="fas fa-download"></i> Yedek Oluştur
+        </button>
+        
+        <button class="backup-button" onclick="document.getElementById('restoreFile').click()">
+            <i class="fas fa-upload"></i> Yedek Yükle
+        </button>
+        
+        <button class="backup-button" onclick="exportSettings()">
+            <i class="fas fa-file-export"></i> Ayarları Dışa Aktar
+        </button>
+    </div>
+    
+    <input type="file" id="restoreFile" accept=".json,.sql" style="display: none;" onchange="restoreBackup(this)">
+</div>
+
+<!-- Recent Logs -->
+<div class="logs-section">
+    <div class="section-header">
+        <div class="section-icon" style="background: var(--neon-green);">
+            <i class="fas fa-file-alt"></i>
+        </div>
+        <h3 class="section-title" style="color: var(--neon-green);">Son Sistem Logları</h3>
+    </div>
+    
+    <div id="recentLogs">
+        {% for log in recent_logs %}
+        <div class="log-entry">
+            <span class="log-time">{{ log.time }}</span>
+            <span class="log-level {{ log.level }}">{{ log.level.upper() }}</span>
+            <span class="log-message">{{ log.message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="text-center" style="margin-top: 20px;">
+        <a href="{{ url_for('admin_logs') }}" class="btn-admin btn-secondary">
+            <i class="fas fa-list"></i> Tüm Logları Görüntüle
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Toggle password visibility
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(inputId + 'Icon');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
+    }
+    
+    // Test RCON connection
+    function testRconConnection() {
+        const btn = document.getElementById('testRconBtn');
+        const status = document.getElementById('rconStatus');
+        const form = document.getElementById('settingsForm');
+        
+        // Get current form values
+        const host = form.rcon_host.value;
+        const port = form.rcon_port.value;
+        const password = form.rcon_password.value;
+        
+        if (!host || !port || !password) {
+            alert('Lütfen RCON bilgilerini doldurun.');
+            return;
+        }
+        
+        // Update button state
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Test Ediliyor...';
+        
+        // Update status
+        status.className = 'status-indicator testing';
+        status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Test Ediliyor...';
+        
+        // Make test request
+        fetch('/admin/test-rcon', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                host: host,
+                port: parseInt(port),
+                password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                status.className = 'status-indicator online';
+                status.innerHTML = '<i class="fas fa-check-circle"></i> Bağlı';
+                
+                // Show success message
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-success';
+                alert.innerHTML = '<i class="fas fa-check-circle"></i> RCON bağlantısı başarılı!';
+                document.querySelector('.content-area').insertBefore(alert, document.querySelector('.settings-grid'));
+            } else {
+                status.className = 'status-indicator offline';
+                status.innerHTML = '<i class="fas fa-times-circle"></i> Bağlantısız';
+                
+                // Show error message
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-danger';
+                alert.innerHTML = '<i class="fas fa-exclamation-triangle"></i> RCON bağlantısı başarısız: ' + data.message;
+                document.querySelector('.content-area').insertBefore(alert, document.querySelector('.settings-grid'));
+            }
+        })
+        .catch(error => {
+            status.className = 'status-indicator offline';
+            status.innerHTML = '<i class="fas fa-times-circle"></i> Bağlantısız';
+            
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger';
+            alert.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Test sırasında hata oluştu: ' + error.message;
+            document.querySelector('.content-area').insertBefore(alert, document.querySelector('.settings-grid'));
+        })
+        .finally(() => {
+            // Reset button
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-plug"></i> Bağlantıyı Test Et';
+        });
+    }
+    
+    // Reset form
+    function resetForm() {
+        if (confirm('Tüm değişiklikleri sıfırlamak istediğinizden emin misiniz?')) {
+            document.getElementById('settingsForm').reset();
+        }
+    }
+    
+    // Create backup
+    function createBackup() {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yedek Oluşturuluyor...';
+        btn.disabled = true;
+        
+        fetch('/admin/create-backup', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            }
+            throw new Error('Yedek oluşturulamadı');
+        })
+        .then(blob => {
+            // Download the backup file
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `rust-vip-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            alert('Yedek başarıyla oluşturuldu ve indirildi.');
+        })
+        .catch(error => {
+            alert('Yedek oluşturulurken hata oluştu: ' + error.message);
+        })
+        .finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }
+    
+    // Restore backup
+    function restoreBackup(input) {
+        const file = input.files[0];
+        if (!file) return;
+        
+        if (confirm('Bu işlem mevcut verileri değiştirecek. Devam etmek istediğinizden emin misiniz?')) {
+            const formData = new FormData();
+            formData.append('backup_file', file);
+            
+            fetch('/admin/restore-backup', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Yedek başarıyla geri yüklendi. Sayfa yeniden yüklenecek.');
+                    location.reload();
+                } else {
+                    alert('Yedek geri yüklenirken hata oluştu: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Yedek geri yüklenirken hata oluştu: ' + error.message);
+            });
+        }
+        
+        // Reset file input
+        input.value = '';
+    }
+    
+    // Export settings
+    function exportSettings() {
+        fetch('/admin/export-settings', {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            }
+            throw new Error('Ayarlar dışa aktarılamadı');
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `rust-vip-settings-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        })
+        .catch(error => {
+            alert('Ayarlar dışa aktarılırken hata oluştu: ' + error.message);
+        });
+    }
+    
+    // Form submission
+    document.getElementById('settingsForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const saveBtn = document.getElementById('saveBtn');
+        const originalText = saveBtn.innerHTML;
+        
+        // Validate passwords if provided
+        const newPassword = this.new_admin_password.value;
+        const confirmPassword = this.confirm_admin_password.value;
+        
+        if (newPassword && newPassword !== confirmPassword) {
+            alert('Şifreler eşleşmiyor!');
+            return;
+        }
+        
+        if (newPassword && newPassword.length < 6) {
+            alert('Şifre en az 6 karakter olmalıdır!');
+            return;
+        }
+        
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kaydediliyor...';
+        saveBtn.disabled = true;
+        
+        const formData = new FormData(this);
+        
+        fetch('/admin/settings', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-success';
+                alert.innerHTML = '<i class="fas fa-check-circle"></i> Ayarlar başarıyla kaydedildi!';
+                document.querySelector('.content-area').insertBefore(alert, document.querySelector('.settings-grid'));
+                
+                // Clear password fields
+                this.new_admin_password.value = '';
+                this.confirm_admin_password.value = '';
+            } else {
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-danger';
+                alert.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Ayarlar kaydedilirken hata oluştu: ' + data.message;
+                document.querySelector('.content-area').insertBefore(alert, document.querySelector('.settings-grid'));
+            }
+        })
+        .catch(error => {
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger';
+            alert.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Ayarlar kaydedilirken hata oluştu: ' + error.message;
+            document.querySelector('.content-area').insertBefore(alert, document.querySelector('.settings-grid'));
+        })
+        .finally(() => {
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+        });
+    });
+    
+    // Auto-save draft every 30 seconds
+    setInterval(() => {
+        const formData = new FormData(document.getElementById('settingsForm'));
+        formData.append('draft', 'true');
+        
+        fetch('/admin/settings/draft', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        }).catch(() => {
+            // Ignore errors for draft saves
+        });
+    }, 30000);
+</script>
+{% endblock %}
