@@ -1,28 +1,11 @@
-# Rust VIP Satış Uygulaması Gereksinimleri
-
-# Flask ve Uzantıları
-Flask==2.3.3
+Flask==3.0.0
 Flask-SQLAlchemy==3.1.1
-Flask-Login==0.6.2
+Flask-Login==0.6.3
 Flask-WTF==1.1.1
-WTForms==3.0.1
-Flask-Migrate==4.0.5
-Flask-Bcrypt==1.0.1
-
-# Veritabanı
-SQLAlchemy==2.0.21
-
-# RCON Bağlantısı için
-rcon==2.4.4
-
-# Güvenlik
-werkzeug==2.3.7
-PyJWT==2.8.0
-
-# Yardımcı Araçlar
 python-dotenv==1.0.0
 requests==2.31.0
-markupsafe==2.1.3
-
-# Üretim Sunucusu
-gunicorn==21.2.0
+bcrypt==4.0.1
+Flask-Migrate==4.0.5
+Werkzeug==3.0.1
+python-dateutil==2.8.2
+rcon==1.3.8 
